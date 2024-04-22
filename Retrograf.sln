@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Retrograf", "Retrograf\Retrograf\Retrograf.csproj", "{BD17DA42-4F89-4E09-8125-ED240CC40469}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Retrograf.Client", "Retrograf\Retrograf.Client\Retrograf.Client.csproj", "{70B6F294-47D0-400A-9AC8-9518CE71251C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clases", "Clases\Clases.csproj", "{D5B4219A-E432-4AB2-B4B3-8A1661434177}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BD17DA42-4F89-4E09-8125-ED240CC40469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD17DA42-4F89-4E09-8125-ED240CC40469}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD17DA42-4F89-4E09-8125-ED240CC40469}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD17DA42-4F89-4E09-8125-ED240CC40469}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70B6F294-47D0-400A-9AC8-9518CE71251C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70B6F294-47D0-400A-9AC8-9518CE71251C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70B6F294-47D0-400A-9AC8-9518CE71251C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70B6F294-47D0-400A-9AC8-9518CE71251C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5B4219A-E432-4AB2-B4B3-8A1661434177}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5B4219A-E432-4AB2-B4B3-8A1661434177}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5B4219A-E432-4AB2-B4B3-8A1661434177}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5B4219A-E432-4AB2-B4B3-8A1661434177}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6188B45B-4D34-4947-BE9B-F90F39611B0C}
+	EndGlobalSection
+EndGlobal
