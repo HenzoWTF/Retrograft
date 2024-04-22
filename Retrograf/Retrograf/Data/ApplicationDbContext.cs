@@ -11,5 +11,5 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Facturas> Facturas { get; set; }
     public DbSet<Productos> Productos { get; set; }
     public DbSet<Ventas> Ventas { get; set; }
-
+    public DbSet<Cuadre> Cuadres { get; set; }
 }
