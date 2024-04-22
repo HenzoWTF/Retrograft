@@ -12,6 +12,7 @@ public class Compra
     [Key]
     public int CompraId { get; set; }
     public DateTime FecheDeCompra { get; set; } = DateTime.Now;
+    public float ValorDeCompra { get; set; }
 
     [ForeignKey("CompraId")]
     public ICollection<CompraDetalle> CompraDetalles { get; set; } = new List<CompraDetalle>();
