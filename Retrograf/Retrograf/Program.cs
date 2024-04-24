@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Radzen;
 using Retrograf.Client.Pages;
 using Retrograf.Components;
 using Retrograf.Components.Account;
 using Retrograf.Data;
+using Retrograf.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +31,15 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<ProductosServices>();
+builder.Services.AddScoped<FacturasServices>();
+builder.Services.AddScoped<ComprasServices>();
+builder.Services.AddScoped<ProductosServices>();
+builder.Services.AddScoped<VentasServices>();
+builder.Services.AddScoped<CuadreServices>();
+
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()

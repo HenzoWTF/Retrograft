@@ -13,6 +13,10 @@ public class VentasServices(ApplicationDbContext context)
         {
             VentaId = d.VentaId,
             Fecha = d.Fecha,
+            Total = d.Total,
+            Cobrada = d.Cobrada,
+            Deuda = d.Deuda,
+            FormaDePago = d.FormaDePago,
             VentaDetalle = d.VentaDetalle
         }).ToListAsync();
     }

@@ -48,7 +48,7 @@ public class CuadreServices(ApplicationDbContext _context)
             .ToListAsync();
 
 
-        return ventas.Sum(v => v.Valor);
+        return ventas.Sum(v => v.Total);
     }
 
 
@@ -75,7 +75,7 @@ public class CuadreServices(ApplicationDbContext _context)
             .Where(v => v.Fecha.Date >= fechaInicio.Date && v.Fecha.Date <= fechaFin.Date)
             .ToListAsync();
 
-        float totalVentas = ventasSemana.Sum(v => v.Valor);
+        float totalVentas = ventasSemana.Sum(v => v.Total);
 
         return totalVentas;
     }
