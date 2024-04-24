@@ -123,3 +123,7 @@
         overflow-y: auto;
     }
 }
+
+.nav-scrollable.hidden {
+    display: none;
+}
