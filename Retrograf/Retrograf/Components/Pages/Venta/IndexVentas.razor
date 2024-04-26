@@ -1,0 +1,169 @@
+﻿@page "/IndexVentas"
+
+@using Microsoft.AspNetCore.Authorization
+@inject VentasServices ventasService
+@inject NavigationManager navigationManager
+@inject ProductosServices productosServices
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+@* @attribute [Authorize(Roles = "Admin")] *@
+
+
+
+
+<PageTitle>Ventas</PageTitle>
+<RadzenNotification />
+
+<h1 class="fw-bold mb-2 text-uppercase">Ventas</h1>
+<section class=" gradient-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="fondo " style="border-radius: 1rem;">
+
+                <div class="card-body p-5 text-center">
+
+                    <div class="tab-content">
+                        <form>
+                            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Fecha de venta</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        @if (ventas.Count == 0)
+                                        {
+                                            @mensaje
+                                        }
+                                        else
+                                        {
+                                            @foreach (var venta in ventas)
+                                            {
+                                                <tr>
+                                                    <td>@venta.VentaId</td>
+                                                    <td>@venta.Fecha.ToShortDateString()</td>
+                                                    <td>
+                                                        <div>
+                                                            <a href="/EditVenta/@venta.VentaId" class="btn btn-outline-primary"><i class="bi bi-pencil-fill" /> Editar</a>
+                                                            <a href="/ViewVenta/@venta.VentaId" class="btn btn-outline-primary"><i class="bi bi-eye" /> View</a>
+                                                            <a href="/DeleteVentas/@venta.VentaId" class="btn btn-outline-danger"><i class="bi bi-trash-fill" /> Eliminar</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+
+
+                                        }
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@code {
+    private List<Ventas> ventas = new List<Ventas>();
+    public IEnumerable<Productos> Productos { get; set; } = new List<Productos>();
+    public string filtro { get; set; }
+    public string valorFiltro { get; set; }
+    public DateTime desde { get; set; } = DateTime.Today;
+    public DateTime hasta { get; set; } = DateTime.Today;
+    public string mensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ventas = (await ventasService.GetVentas()).ToList();
+            Productos = await productosServices.GetProductos();
+            if (ventas == null || !ventas.Any())
+                mensaje = "No hay datos";
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar datos: {ex.Message}";
+        }
+    }
+
+    public async Task Buscar()
+    {
+        try
+        {
+            if (desde > hasta)
+            {
+                mensaje = "La fecha inicial no puede ser mayor a la fecha final";
+                StateHasChanged();
+                await Nuevo();
+                return;
+            }
+
+            else if (filtro == null)
+            {
+                mensaje = "Debe elegir un método para filtrar";
+                StateHasChanged();
+                await Nuevo();
+                return;
+            }
+
+            else if (valorFiltro == null)
+            {
+                mensaje = "Debe ingresar un dato";
+                StateHasChanged();
+                await Nuevo();
+                return;
+            }
+
+            switch (filtro)
+            {
+                case "id":
+                    if (int.TryParse(valorFiltro, out int id))
+                    {
+                        var resultadoId = ventas.FirstOrDefault(p => p.VentaId == id);
+                        if (resultadoId != null && (resultadoId.Fecha >= desde && resultadoId.Fecha <= hasta))
+                        {
+                            ventas.Clear();
+                            ventas.Add(resultadoId);
+                        }
+                        else
+                            mensaje = "No se encontraron resultados";
+                    }
+                    else
+                    {
+                        mensaje = "El valor ingresado para el ID no es válido";
+                    }
+                    break;
+
+                case "fecha":
+                    // Lógica para filtrar por fecha
+                    break;
+
+                default:
+                    mensaje = "Opción de filtro no válida";
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al buscar datos: {ex.Message}";
+        }
+
+        StateHasChanged();
+        await Nuevo();
+    }
+
+    public async Task Nuevo()
+    {
+        mensaje = string.Empty;
+    }
+}

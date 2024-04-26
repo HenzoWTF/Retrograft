@@ -6,7 +6,7 @@ using Retrograf.Data;
 namespace Retrograf.Services;
 public class VentasServices(ApplicationDbContext context)
 {
-    public async Task<IEnumerable<Ventas>> GetVentas()
+    public async Task<List<Ventas>> GetVentas()
     {
         return await context.Ventas.Include(p => p.VentaDetalle)
         .Select(d => new Ventas()
@@ -18,6 +18,20 @@ public class VentasServices(ApplicationDbContext context)
             Deuda = d.Deuda,
             FormaDePago = d.FormaDePago,
             VentaDetalle = d.VentaDetalle
+        }).ToListAsync();
+    }
+    public async Task<List<Ventas>> GetVentasDeudas()
+    {
+        return await context.Ventas
+        .Where(v => !v.Cobrada)
+        .Select(d => new Ventas()
+        {
+            VentaId = d.VentaId,
+            Fecha = d.Fecha,
+            Total = d.Total,
+            Cobrada = d.Cobrada,
+            Deuda = d.Deuda,
+            FormaDePago = d.FormaDePago
         }).ToListAsync();
     }
     public async Task<Ventas?> GetVenta(int id)

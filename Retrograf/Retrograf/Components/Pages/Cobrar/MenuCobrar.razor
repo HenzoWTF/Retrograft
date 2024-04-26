@@ -1,0 +1,176 @@
+﻿@page "/MenuCobrar"
+@inject NotificationService notificationServices
+@inject VentasServices ventasServices
+@inject NavigationManager navigationManager
+@* @attribute [Authorize(Roles = "Admin")] *@
+
+@rendermode InteractiveServer
+
+
+<PageTitle>Cobrar</PageTitle>
+<RadzenNotification />
+
+<a href="/MenuAdmin" class="w-20 btn btn-lg btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+<section class=" gradient-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="fondo " style="border-radius: 1rem;">
+
+                <div class="card-body p-5 text-center">
+                    <h1 class="fw-bold mb-2 text-uppercase">Cobrar</h1>
+
+                    <div class="tab-content">
+                        <form>
+
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Nombre</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @if (!ventas.Any())
+                                    {
+                                        <tr>
+                                            <td colspan="3" class="text-center">@mensaje</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var ventas in ventas)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <img src="/Imagenes/Empleado.png" style="width: 50px; height: auto; margin-right: 10px;" />
+                                                </td>
+                                                <td>@ventas.Fecha</td>
+                                                <td>@ventas.Cliente</td>
+                                                <td>@ventas.Deuda</td>
+                                                <td>
+                                                    <div>
+                                                        @* <a href="/CreateCobrar/@ventas.BarberoId" class="btn btn-primary"><i class="bi bi-coin" /> Cobrar</a> *@
+                                                        <button @onclick="() => ConfirmarEliminar(ventas.VentaId)" class="w-20 btn btn-lg btn-success"><i class="bi bi-floppy" /> Agregar</button>
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@* if (Confirmacion)
+{
+<div class="modal fade show d-block" id="confirmarModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <h5>Deuda actual: @ventass.Deuda</h5>
+                <h5>Ingrese el monto a abonar:</h5>
+                <InputNumber id="Pago" class="form-control" @bind-Value="Pago"></InputNumber>
+                <!-- Elimina el atributo data-bs-dismiss="modal" del botón -->
+                <button type="button" class="btn btn-secondary" @onclick=Guardar>Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+} *@
+
+
+@if (Confirmacion)
+{
+    <div class="modal fade show" id="confirmarModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick=Close></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de que desea eliminar esta factura?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick=Close>Cancelar</button>
+                    @* Use a lambda expression to capture the current ventas object in the loop *@
+                    <button type="button" class="btn btn-danger" @onclick=@(async () => await Guardar(ventass.VentaId))>Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    public List<Ventas> ventas = new List<Ventas>();
+    public Ventas ventass = new Ventas();
+    public string mensaje;
+    public float Pago;
+    public bool Confirmacion = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ventas == null || !ventas.Any())
+            mensaje = "No hay datos";
+
+        ventas = await ventasServices.GetVentasDeudas();
+
+    }
+
+    private void Close()
+    {
+        Confirmacion = false;
+    }
+
+    private async Task ConfirmarEliminar(int id)
+    {
+        // Encuentra la venta correspondiente al ID seleccionado
+        ventass = ventas.FirstOrDefault(v => v.VentaId == id);
+        Confirmacion = true;
+        
+    }
+
+
+    public async Task Guardar(int Id)
+    {
+        // Resta el monto ingresado por el usuario de la deuda actual
+        ventass.Deuda -= Pago;
+        var response = await ventasServices.PutCompras(Id, ventass);
+        if (response != null)
+        {
+            var Mensaje1 = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Guardado",
+                    Detail = "Contacto guardado con éxito",
+                    Duration = 3000
+                };
+            notificationServices.Notify(Mensaje1);
+            await Task.Delay(3000);
+            Confirmacion = false;
+        }
+        else
+        {
+            var Mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error al guardar",
+                    Detail = "Ha ocurrido un error",
+                    Duration = 1_000
+                };
+            notificationServices.Notify(Mensaje);
+        }
+    }
+
+        
+}

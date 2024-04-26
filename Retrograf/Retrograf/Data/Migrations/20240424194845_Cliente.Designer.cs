@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Retrograf.Data;
 
@@ -11,9 +12,11 @@ using Retrograf.Data;
 namespace Retrograf.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240424194845_Cliente")]
+    partial class Cliente
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,9 +79,6 @@ namespace Retrograf.Migrations
                     b.Property<int?>("CompraId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("IdCliente")
-                        .HasColumnType("int");
-
                     b.Property<float>("PrecioCompra")
                         .HasColumnType("real");
 
@@ -88,8 +88,6 @@ namespace Retrograf.Migrations
                     b.HasKey("CompraDetalleId");
 
                     b.HasIndex("CompraId");
-
-                    b.HasIndex("IdCliente");
 
                     b.ToTable("CompraDetalle");
                 });
@@ -231,9 +229,6 @@ namespace Retrograf.Migrations
                         .HasColumnType("bit");
 
                     b.Property<float>("Deuda")
-                        .HasColumnType("real");
-
-                    b.Property<float>("Devolucion")
                         .HasColumnType("real");
 
                     b.Property<DateTime>("Fecha")
@@ -454,10 +449,6 @@ namespace Retrograf.Migrations
                     b.HasOne("Clases.Compra", null)
                         .WithMany("CompraDetalles")
                         .HasForeignKey("CompraId");
-
-                    b.HasOne("Clases.Cliente", null)
-                        .WithMany("CompraDetalles")
-                        .HasForeignKey("IdCliente");
                 });
 
             modelBuilder.Entity("Clases.VentaDetalle", b =>
@@ -518,11 +509,6 @@ namespace Retrograf.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Clases.Cliente", b =>
-                {
-                    b.Navigation("CompraDetalles");
                 });
 
             modelBuilder.Entity("Clases.Compra", b =>

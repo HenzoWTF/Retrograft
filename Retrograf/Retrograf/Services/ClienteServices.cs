@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Retrograf.Data;
+using System.Linq.Expressions;
 
 namespace Retrograf.Services;
 
@@ -71,5 +72,12 @@ public class ClienteServices(ApplicationDbContext context)
     public bool ClientesExists(int id)
     {
         return context.Clientes.Any(e => e.IdCliente == id);
+    }
+    public async Task<List<Cliente>> GetList(Expression<Func<Cliente, bool>> criterio)
+    {
+        return await context.Clientes
+            .AsNoTracking()
+            .Where(criterio)
+            .ToListAsync();
     }
 }
