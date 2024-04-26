@@ -1,0 +1,83 @@
+﻿@page "/EditClientes/{Id:int}"
+@inject ClienteServices ClientesServices
+@rendermode InteractiveServer
+@inject NavigationManager navigationManager
+@inject NotificationService notificationServices
+@inject IJSRuntime JSRuntime
+@* @attribute [Authorize(Roles = "Admin")] *@
+
+<PageTitle>Editar Cliente</PageTitle>
+
+<RadzenNotification />
+
+<EditForm Model="cliente" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <h2 class="fw-bold mb-2 text-uppercase text-center">Crear producto</h2>
+    <section class="vh-100 gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center">
+                <div class="fondo col-lg-6 col-xl-6 " style="border-radius: 2rem;">
+
+                    <div class="card-body p-5">
+
+                        <div class="row tab-content">
+                            <div class="mb-4">
+                                <div class="col-3">
+                                    <!-- Para el nombre -->
+                                    <label class="form-label">Nombre</label>
+                                    <InputText @bind-Value="cliente.NombreCliente" class="form-control" placeholder=" Nombre " />
+                                    <ValidationMessage For="@(() => cliente.NombreCliente)" />
+                                </div>
+
+                                <div class="col-3">
+                                    <!-- Para la fecha -->
+                                    <label class="form-label">Fecha</label>
+                                    <InputText @bind-Value="cliente.DireccionCliente" class="form-control" />
+                                    <ValidationMessage For="@(() => cliente.DireccionCliente)" />
+                                </div>
+                                <div class="d-flex justify-content-center mt-3">
+                                    <button type="submit" class="w-20 btn btn-lg btn-success"><i class="bi bi-floppy"></i> Guardar</button>
+                                    <a href="/IndexProductos" class="w-20 btn btn-lg btn-primary ms-3"><i class="bi bi-arrow-left"></i> Cancelar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    public Cliente cliente = new Cliente();
+
+    protected override async Task OnInitializedAsync()
+    {
+        cliente = await ClientesServices.GetCliente(Id);
+    }
+
+    public async Task Guardar()
+    {
+        var response = await ClientesServices.PutClientes(Id, cliente);
+        if (response != null)
+        {
+            var successMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Guardado",
+                    Detail = "Producto guardado con éxito",
+                    Duration = 1000
+                };
+            notificationServices.Notify(successMessage);
+            navigationManager.NavigateTo("/ClientesIndex");
+        }
+    }
+    void Volver()
+    {
+        navigationManager.NavigateTo("/ClientesIndex");
+    }
+}

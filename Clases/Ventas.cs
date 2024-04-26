@@ -20,7 +20,9 @@ public class Ventas
     public float Total { get; set; }
     public bool Cobrada { get; set; }
     public float Deuda { get; set; }
+    public float Devolucion { get; set; }
     public string FormaDePago { get; set; }
+    public string Cliente { get; set; }
 
     [ForeignKey("VentaId")]
     public List<VentaDetalle> VentaDetalle { get; set; } = new List<VentaDetalle>();

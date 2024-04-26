@@ -1,0 +1,119 @@
+﻿@page "/DeleteCliente/{Id:int}"
+@inject ClienteServices ClientesServices
+@inject NavigationManager NavigationManager
+@inject NavigationManager navigationManager
+@inject NotificationService notificationServices
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+@* @attribute [Authorize(Roles = "Admin")] *@
+
+<RadzenNotification />
+
+<PageTitle>Eliminar Cliente</PageTitle>
+
+<section class="vh-100 gradient-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center">
+            <div class="fondo col-lg-6 col-xl-6 " style="border-radius: 2rem;">
+
+                <div class="card-body p-5">
+                    <h2 class="fw-bold mb-2 text-uppercase text-center">Editar ventas</h2>
+
+                    <div class="row tab-content">
+                        <div class="mb-4">
+                            <div class="row card-body">
+                                <!-- Datos de la venta -->
+                                <div class="col-md-11 mx-auto">
+                                    <h3 class="text-center"><strong>Datos de la venta</strong></h3>
+                                    <div class="border-primmary border border-2 borde">
+                                        <div class="card-body">
+                                            <ul class="list-unstyled" style="margin-top: 20px; margin-bottom: 20px;">
+                                                <li><strong>Fecha:</strong> @ClienteSeleccionado.NombreCliente</li>
+                                                <li><strong>Nombre:</strong> @ClienteSeleccionado.DireccionCliente</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center mt-3">
+                            <button @onclick="() => ConfirmarEliminar(ClienteSeleccionado.IdCliente)" class="btn btn-outline-danger"><i class="bi bi-trash-fill" /> Eliminar</button>
+                            <a href="/IndexVentas" class="w-20 btn btn-lg btn-primary ms-3"><i class="bi bi-arrow-left"></i> Volver</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@if (Confirmacion)
+{
+    <div class="modal fade show" id="confirmarModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick=Close></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de que desea eliminar esta factura?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick=Close>Cancelar</button>
+                    <button type="button" class="btn btn-danger" @onclick=@(async () => await Eliminar(Id))>Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public bool Confirmacion = false;
+
+    public Cliente ClienteSeleccionado { get; set; } = new Cliente();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ClienteSeleccionado = await ClientesServices.GetCliente(Id);
+    }
+
+
+
+    private void Close()
+    {
+        Confirmacion = false;
+    }
+
+    private async Task Eliminar(int Id)
+    {
+        if (Id != 0)
+        {
+            await ClientesServices.DeleteClientes(Id);
+
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Eliminación exitosa",
+                    Detail = "Se ha eliminado la venta correctamente",
+                    Duration = 3000
+                };
+            notificationServices.Notify(mensaje);
+
+            await Task.Delay(3000);
+            navigationManager.NavigateTo("/ClientesIndex");
+        }
+    }
+    private async Task ConfirmarEliminar(int id)
+    {
+        Confirmacion = true;
+    }
+
+    public void Volver()
+    {
+        NavigationManager.NavigateTo("/ClientesIndex");
+    }
+}
