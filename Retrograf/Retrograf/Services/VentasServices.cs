@@ -39,6 +39,10 @@ public class VentasServices(ApplicationDbContext context)
         return await context.Ventas.Include(p => p.VentaDetalle)
             .Where(c => c.VentaId == id).FirstOrDefaultAsync();
     }
+    public async Task<Ventas?> GetVentaDeuda(int id)
+    {
+        return await context.Ventas.FindAsync(id);
+    }
 
     public async Task<Ventas> PostVentas(Ventas Venta)
     {
