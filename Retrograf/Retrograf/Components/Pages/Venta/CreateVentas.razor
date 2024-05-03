@@ -11,7 +11,9 @@
 @* @attribute [Authorize(Roles = "Admin")] *@
 @rendermode InteractiveServer
 
-
+<div class="d-flex justify-content-center">
+    <img src="/Imagenes/Logo.png" alt="Logo de la aplicación" style="width:200px; height:auto; display: block;">
+</div>
 
 <PageTitle>Ventas</PageTitle>
 <RadzenNotification />
@@ -141,7 +143,7 @@
 
                             <div class="d-flex justify-content-center mt-3">                                
                                 <button @onclick="() => ConfirmarEliminar(ventas.VentaId)" class="w-20 btn btn-lg btn-success"><i class="bi bi-floppy" /> Agregar</button>
-                                <a href="/MenuFactura" class="w-20 btn btn-lg btn-primary ms-3"><i class="bi bi-arrow-left"></i> Cancelar</a>
+                                <a href="/ClientesIndex" class="w-20 btn btn-lg btn-primary ms-3"><i class="bi bi-arrow-left"></i> Cancelar</a>
                             </div>
                         </div>
                     </div>
