@@ -11,80 +11,83 @@
 @* @attribute [Authorize(Roles = "Admin")] *@
 <PageTitle>Ventas</PageTitle>
 
-<section class="vh-100 gradient-custom">
+<section class=" gradient-custom">
     <div class="container py-5 h-100">
-        <div class="row d-flex justify-content-center">
-            <div class="fondo col-lg-6 col-xl-6 " style="border-radius: 2rem;">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="fondo col-lg-6 col-xl-6" style="border-radius: 1rem;">
 
-                <div class="card-body p-5">
-                    <h2 class="fw-bold mb-2 text-uppercase text-center">Editar ventas</h2>
+                <div class="card-body p-5 text-center">
 
-                    <div class="row tab-content">
-                        <div class="mb-4">
-                            <div>
-                                <div class="row card-body">
-                                    <!-- Datos de la venta -->
-                                    <div class="col-md-11 mx-auto">
-                                        <h3 class="text-center"><strong>Datos de la venta</strong></h3>
-                                        <div class="border-primmary border border-2 borde">
-                                            <div class="card-body">
-                                                <ul class="list-unstyled" style="margin-top: 20px; margin-bottom: 20px;">
-                                                    <li><strong>Id:</strong> @Ventas.VentaId</li>
-                                                    <li><strong>Fecha Creacion:</strong> @Ventas.Fecha.ToShortDateString()</li>
-                                                    <li><strong>Cliente:</strong> @Ventas.Cliente</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Productos -->
-                                    <div class="col-md-11 mx-auto">
-                                        <h3 class="text-center"><strong>Productos</strong></h3>
-                                        @if (Ventas.VentaDetalle.Count > 0)
-                                        {
-                                            <table class="table miTabla">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Producto</th>
-                                                        <th>Cantidad</th>
-                                                        <th>Precio Venta</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach (var detalle in Ventas.VentaDetalle)
-                                                    {
-                                                        <tr>
-                                                            <td>@ObtenerProducto(detalle.ProductoId)</td>
-                                                            <td>@detalle.Cantidad</td>
-                                                            <td>@ObtenerProductoPrecio(detalle.ProductoId).ToString("N2")</td>
-                                                        </tr>
-                                                    }
-                                                </tbody>
-                                            </table>
+                    <div class="tab-content">
+                        <h1 class="fw-bold mb-2 text-uppercase">Venta</h1>
 
-                                            <div class="d-flex justify-content-between">
-                                                <div>
-                                                    <p><strong>Total de ventas: </strong>@Ventas.VentaDetalle.Count</p>
-                                                </div>
-                                                <div>
-                                                    <p><strong>Total : </strong>@CalcularTotalVentas().ToString("N2")</p>
-                                                </div>
-                                            </div>
-                                        }
-                                    </div>
-
+                        <div class="col-md-11 mx-auto">
+                            <h3 class="text-center"><strong>Datos de la venta</strong></h3>
+                            <div class="border-primary border border-2">
+                                <div class="card-body">
+                                    <ul class="list-unstyled" style="margin-top: 20px; margin-bottom: 20px;">
+                                        <li><strong>Id:</strong> @Ventas.VentaId</li>
+                                        <li><strong>Fecha Creacion:</strong> @Ventas.Fecha.ToShortDateString()</li>
+                                        <li><strong>Cliente:</strong> @Ventas.Cliente</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
-                        <div class="d-flex justify-content-center mt-3">
-                            <a href="/IndexVentas" class="w-20 btn btn-lg btn-primary ms-3"><i class="bi bi-arrow-left"></i> Volver</a>
+
+
+                        <div class="col-md-11 mx-auto">
+                            <h3 class="text-center"><strong>Productos</strong></h3>
+                            @if (Ventas.VentaDetalle.Count > 0)
+                            {
+                                <table class="table miTabla">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio Venta</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var detalle in Ventas.VentaDetalle)
+                                        {
+                                            <tr>
+                                                <td>@ObtenerProducto(detalle.ProductoId)</td>
+                                                <td>@detalle.Cantidad</td>
+                                                <td>@ObtenerProductoPrecio(detalle.ProductoId).ToString("N2")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <p><strong>Total de ventas: </strong>@Ventas.VentaDetalle.Count</p>
+                                        <p><strong>Devolucion </strong>@Ventas.Devolucion</p>
+                                    </div>
+                                    <div>
+                                        <p><strong>Forma de pago: </strong>@Ventas.FormaDePago</p>
+                                        <p><strong>Total : </strong>@CalcularTotalVentas().ToString("N2")</p>
+                                        <p><strong>Deuda : </strong>@Ventas.Deuda</p>
+                                    </div>
+                                </div>
+                            }
                         </div>
+
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="d-flex justify-content-center mt-3">
+                        <td>
+                            <div>
+                                <a href="/IndexVentas" class="w-20 btn btn-outline-primary ms-3"><i class="bi bi-arrow-left"></i> Volver</a>
+                            </div>
+                        </td>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
 
 @code {
 

@@ -9,7 +9,6 @@
 
 <PageTitle>Ventas</PageTitle>
 
-<h1 class="fw-bold mb-2 text-uppercase">Eliminar ventas</h1>
 <section class=" gradient-custom">
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center">
@@ -18,6 +17,7 @@
                 <div class="card-body p-5 text-center">
 
                     <div class="tab-content">
+                        <h1 class="fw-bold mb-2 text-uppercase">Eliminar ventas</h1>
 
                         <div class="col-md-11 mx-auto">
                             <h3 class="text-center"><strong>Datos de la venta</strong></h3>
@@ -60,9 +60,12 @@
                                 <div class="d-flex justify-content-between">
                                     <div>
                                         <p><strong>Total de ventas: </strong>@Ventas.VentaDetalle.Count</p>
+                                        <p><strong>Devolucion </strong>@Ventas.Devolucion</p>
                                     </div>
                                     <div>
+                                        <p><strong>Forma de pago: </strong>@Ventas.FormaDePago</p>
                                         <p><strong>Total : </strong>@CalcularTotalVentas().ToString("N2")</p>
+                                        <p><strong>Deuda : </strong>@Ventas.Deuda</p>
                                     </div>
                                 </div>
                             }

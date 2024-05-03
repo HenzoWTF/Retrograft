@@ -7,7 +7,7 @@ namespace Retrograf.Services;
 
 public class ProductosServices(ApplicationDbContext context)
 {
-    public async Task<IEnumerable<Productos>> GetProductos()
+    public async Task<List<Productos>> GetProductos()
     {
         return await context.Productos
         .Select(d => new Productos()
@@ -78,5 +78,6 @@ public class ProductosServices(ApplicationDbContext context)
     }
 
 }
+
 
 

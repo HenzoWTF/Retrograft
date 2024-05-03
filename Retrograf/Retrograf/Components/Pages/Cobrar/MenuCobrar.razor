@@ -10,7 +10,6 @@
 <PageTitle>Cobrar</PageTitle>
 <RadzenNotification />
 
-<a href="/MenuAdmin" class="w-20 btn btn-lg btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
 <section class=" gradient-custom">
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center">
@@ -26,7 +25,9 @@
                                 <thead>
                                     <tr>
                                         <th></th>
-                                        <th>Nombre</th>
+                                        <th>Fecha</th>
+                                        <th>Cliente</th>
+                                        <th>Deuda</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -43,15 +44,14 @@
                                         @foreach (var ventas in ventas)
                                         {
                                             <tr>
-                                                <td>
-                                                    <img src="/Imagenes/Empleado.png" style="width: 50px; height: auto; margin-right: 10px;" />
-                                                </td>
-                                                <td>@ventas.Fecha</td>
+                                                <img src="/Imagenes/Factura.png" style="width: 50px; height: auto; margin-right: 10px;" />
+                                                <td>@ventas.Fecha.ToShortDateString()</td>
                                                 <td>@ventas.Cliente</td>
                                                 <td>@ventas.Deuda</td>
                                                 <td>
                                                     <div>
-                                                        <a href="/CreateCobrar/@ventas.VentaId" class="btn btn-primary"><i class="bi bi-coin" /> Cobrar</a>
+                                                        <a href="/ViewVenta/@ventas.VentaId" class="btn btn-outline-primary"><i class="bi bi-eye" /> Ver</a>
+                                                        <a href="/CreateCobrar/@ventas.VentaId" class="btn btn-outline-primary"><i class="bi bi-coin" /> Cobrar</a>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -66,25 +66,6 @@
         </div>
     </div>
 </section>
-
-
-@* if (Confirmacion)
-{
-<div class="modal fade show d-block" id="confirmarModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <h5>Deuda actual: @ventass.Deuda</h5>
-                <h5>Ingrese el monto a abonar:</h5>
-                <InputNumber id="Pago" class="form-control" @bind-Value="Pago"></InputNumber>
-                <!-- Elimina el atributo data-bs-dismiss="modal" del botón -->
-                <button type="button" class="btn btn-secondary" @onclick=Guardar>Ok</button>
-            </div>
-        </div>
-    </div>
-</div>
-} *@
-
 
 @code {
     public List<Ventas> ventas = new List<Ventas>();

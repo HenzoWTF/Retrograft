@@ -14,21 +14,47 @@
 <PageTitle>Ventas</PageTitle>
 <RadzenNotification />
 
-<h1 class="fw-bold mb-2 text-uppercase">Ventas</h1>
 <section class=" gradient-custom">
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center">
             <div class="fondo " style="border-radius: 1rem;">
 
                 <div class="card-body p-5 text-center">
+                    <h1 class="fw-bold mb-2 text-uppercase">Ventas</h1>
+                    <div class="row">
+                        <div class="col-8">
+
+                            @* Fechas *@
+                            <h4>Filtrar Clientes</h4>
+                            <div class='row'>
+                                <div class='col-4'>
+                                    <label>Nombre</label>
+                                    <div class="input-group mb-3">
+                                        <input id="criterioBusqueda" type="text" class="form-control" @bind="criterio" />
+                                        <button type="button" @onclick="Filtrar" class="btn btn-outline-primary bi bi-search"></button>
+                                    </div>
+                                </div>
+                                <div class='col-4'>
+                                    <label>Fecha de Registro Desde</label>
+                                    <InputDate @bind-Value="FechaInicial" class="form-control"></InputDate>
+                                </div>
+                                <div class='col-4'>
+                                    <label>Fecha de Registro Hasta</label>
+                                    <InputDate @bind-Value="FechaFinal" class="form-control"></InputDate>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="tab-content">
                         <form>
-                            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                            <div class="table-container" style="max-height: 800px; overflow-y: auto;">
                                 <table class="table">
                                     <thead>
                                         <tr>
                                             <th>Id</th>
+                                            <th>Cliente</th>
                                             <th>Fecha de venta</th>
                                             <th>Acciones</th>
                                         </tr>
@@ -45,6 +71,7 @@
                                             {
                                                 <tr>
                                                     <td>@venta.VentaId</td>
+                                                    <td>@venta.Cliente</td>
                                                     <td>@venta.Fecha.ToShortDateString()</td>
                                                     <td>
                                                         <div>
@@ -61,6 +88,9 @@
                                     </tbody>
 
                                 </table>
+                                <div>
+                                    <button type="button" @onclick="ReiniciarFiltro" class="btn btn-outline-secondary bi bi-arrow-clockwise"> Reiniciar Filtro</button>
+                                </div>
 
                             </div>
                         </form>
@@ -74,19 +104,18 @@
 
 @code {
     private List<Ventas> ventas = new List<Ventas>();
-    public IEnumerable<Productos> Productos { get; set; } = new List<Productos>();
     public string filtro { get; set; }
-    public string valorFiltro { get; set; }
-    public DateTime desde { get; set; } = DateTime.Today;
-    public DateTime hasta { get; set; } = DateTime.Today;
+    public string criterio { get; set; } = string.Empty;
+    public DateTime FechaInicial { get; set; } = DateTime.Today.AddDays(-7); // Default: 7 días atrás
+    public DateTime FechaFinal { get; set; } = DateTime.Today;
     public string mensaje = "";
+    public IEnumerable<Cliente> cliente = new List<Cliente>();
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             ventas = (await ventasService.GetVentas()).ToList();
-            Productos = await productosServices.GetProductos();
             if (ventas == null || !ventas.Any())
                 mensaje = "No hay datos";
         }
@@ -96,74 +125,23 @@
         }
     }
 
-    public async Task Buscar()
-    {
-        try
-        {
-            if (desde > hasta)
-            {
-                mensaje = "La fecha inicial no puede ser mayor a la fecha final";
-                StateHasChanged();
-                await Nuevo();
-                return;
-            }
-
-            else if (filtro == null)
-            {
-                mensaje = "Debe elegir un método para filtrar";
-                StateHasChanged();
-                await Nuevo();
-                return;
-            }
-
-            else if (valorFiltro == null)
-            {
-                mensaje = "Debe ingresar un dato";
-                StateHasChanged();
-                await Nuevo();
-                return;
-            }
-
-            switch (filtro)
-            {
-                case "id":
-                    if (int.TryParse(valorFiltro, out int id))
-                    {
-                        var resultadoId = ventas.FirstOrDefault(p => p.VentaId == id);
-                        if (resultadoId != null && (resultadoId.Fecha >= desde && resultadoId.Fecha <= hasta))
-                        {
-                            ventas.Clear();
-                            ventas.Add(resultadoId);
-                        }
-                        else
-                            mensaje = "No se encontraron resultados";
-                    }
-                    else
-                    {
-                        mensaje = "El valor ingresado para el ID no es válido";
-                    }
-                    break;
-
-                case "fecha":
-                    // Lógica para filtrar por fecha
-                    break;
-
-                default:
-                    mensaje = "Opción de filtro no válida";
-                    break;
-            }
-        }
-        catch (Exception ex)
-        {
-            mensaje = $"Error al buscar datos: {ex.Message}";
-        }
-
-        StateHasChanged();
-        await Nuevo();
-    }
-
     public async Task Nuevo()
     {
         mensaje = string.Empty;
+    }
+
+    async Task Filtrar()
+    {
+        ventas = await ventasService.GetList(Venta =>
+            (string.IsNullOrEmpty(criterio) || Venta.Cliente.Contains(criterio)));
+    }
+
+
+    void ReiniciarFiltro()
+    {
+        criterio = string.Empty;
+        FechaInicial = DateTime.Today.AddDays(-7);
+        FechaFinal = DateTime.Today;
+        Filtrar();
     }
 }

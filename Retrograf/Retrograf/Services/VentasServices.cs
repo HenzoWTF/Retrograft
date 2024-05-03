@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Retrograf.Data;
+using System.Linq.Expressions;
 
 namespace Retrograf.Services;
 public class VentasServices(ApplicationDbContext context)
@@ -17,6 +18,7 @@ public class VentasServices(ApplicationDbContext context)
             Cobrada = d.Cobrada,
             Deuda = d.Deuda,
             FormaDePago = d.FormaDePago,
+            Cliente = d.Cliente,
             VentaDetalle = d.VentaDetalle
         }).ToListAsync();
     }
@@ -31,6 +33,7 @@ public class VentasServices(ApplicationDbContext context)
             Total = d.Total,
             Cobrada = d.Cobrada,
             Deuda = d.Deuda,
+            Cliente = d.Cliente,
             FormaDePago = d.FormaDePago
         }).ToListAsync();
     }
@@ -113,5 +116,20 @@ public class VentasServices(ApplicationDbContext context)
         return context.Ventas.Any(e => e.VentaId == id);
     }
 
+    public async Task<List<Ventas>> GetList(Expression<Func<Ventas, bool>> criterio)
+    {
+        return await context.Ventas
+            .AsNoTracking()
+            .Where(criterio)
+            .ToListAsync();
+    }
+    public async Task<List<Ventas>> GetListDeuda(Expression<Func<Ventas, bool>> criterio)
+    {
+        return await context.Ventas
+            .AsNoTracking()
+            .Where(criterio)
+            .Where(v => !v.Cobrada)
+            .ToListAsync();
+    }
 }
 

@@ -8,22 +8,22 @@
 <RadzenNotification />
 <PageTitle>Producto</PageTitle>
 
-
-
-<div class="row">
-    <div class="col-4">
-        <h1 class="fw-bold mb-2 text-uppercase">Inventario</h1>
-        <label>Cantidad de productos:</label>
-        <span class="badge bg-secondary">@productos.Count()</span>
-    </div>
+<div class="d-flex justify-content-center">
+    <img src="/Imagenes/Logo.png" alt="Logo de la aplicación" style="width:200px; height:auto; display: block;">
 </div>
-
 <section class=" gradient-custom">
     <div class="container py-2 h-100">
         <div class="row d-flex justify-content-center align-items-center">
             <div class="fondo " style="border-radius: 1rem;">
 
-                <div class="card-body p-1 text-center">
+                <div class="card-body p-1 justify-content-center">
+                    <div class="row">
+                        <div class="col-4">
+                            <h1 class="fw-bold mb-2 text-uppercase">Inventario</h1>
+                            <label>Cantidad de productos:</label>
+                            <span class="badge bg-secondary">@productos.Count()</span>
+                        </div>
+                    </div>
 
                     <div class="row">
                         <div class="col-8">
@@ -57,10 +57,9 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-
                     </div>
+
                     <div class="tab-content">
                         <form>
 
@@ -93,9 +92,9 @@
                                                 <td>@productos.Cantidad</td>
                                                 <td>
                                                     <div>
-                                                        <a href="/EditProducto/@productos.ProductoId" class="btn btn-outline-primary"><i class="bi bi-pencil-fill" /></a>
-                                                        <a href="/ViewProductos/@productos.ProductoId" class="btn btn-outline-primary"><i class="bi bi-eye-fill" /></a>
-                                                        <a href="/DeleteProductos/@productos.ProductoId" class="btn btn-outline-danger"><i class="bi bi-trash-fill" /></a>
+                                                        <a href="/EditProducto/@productos.ProductoId" class="btn btn-outline-primary"><i class="bi bi-pencil-fill" /> Editar</a>
+                                                        <a href="/ViewProductos/@productos.ProductoId" class="btn btn-outline-primary"><i class="bi bi-eye-fill" /> Ver</a>
+                                                        <a href="/DeleteProductos/@productos.ProductoId" class="btn btn-outline-danger"><i class="bi bi-trash-fill" /> Eliminar</a>
                                                     </div>
                                                 </td>
                                             </tr>

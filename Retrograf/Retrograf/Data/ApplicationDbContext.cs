@@ -12,4 +12,5 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Productos> Productos { get; set; }
     public DbSet<Ventas> Ventas { get; set; }
     public DbSet<Cuadre> Cuadres { get; set; }
+    public DbSet<ProductoMasVendido> ProductoMasVendido { get; set; }
 }

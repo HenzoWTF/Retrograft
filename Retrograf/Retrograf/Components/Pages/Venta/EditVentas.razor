@@ -18,7 +18,6 @@
 <EditForm Model="@ventas" OnValidSubmit="Guardar" FormName="ventas">
     <DataAnnotationsValidator />
 
-    <h2 class="fw-bold mb-2">Ventas</h2>
 
     <section class="vh-100 gradient-custom">
         <div class="container py-3">
@@ -28,6 +27,9 @@
                     <div class="card-body p-5">
 
                         <div class="row tab-content">
+                            <div class="text-center">
+                                <h2 class="fw-bold mb-2">Editar Ventas</h2>
+                            </div>
                             <div class="mb-4">
                                 <div>
                                     <div class="row card-body justify-content-center">
@@ -113,17 +115,34 @@
                                                             }
                                                         </tbody>
                                                     </table>
+
                                                     <p><strong>Total de Productos: </strong>@ventas.VentaDetalle.Count</p>
                                                 }
                                             </section>
                                         </div>
                                     </fieldset>
                                 </div>
+                                <div class="row justify-content-center">
+                                    <div class="col-4">
+                                        <label>Forma de Pago:</label>
+                                        <InputSelect id="FormaDePago" class="form-select" @bind-Value="ventas.FormaDePago">
+                                            <option> </option>
+                                            <option value="Efectivo">Efectivo</option>
+                                            <option value="Crédito">Crédito</option>
+                                        </InputSelect>
+                                    </div>
+
+                                    <div class="col-4">
+                                        <label>Pago</label>
+                                        <InputNumber id="Pago" class="form-control" @bind-Value="Pago"></InputNumber>
+                                    </div>
+
+                                </div>
                             </div>
 
                             <div class="d-flex justify-content-center mt-3">
-                                <button type="submit" class="w-20 btn btn-lg btn-success"><i class="bi bi-floppy"></i> Agregar</button>
-                                <a href="/MenuFactura" class="w-20 btn btn-lg btn-primary ms-3"><i class="bi bi-arrow-left"></i> Cancelar</a>
+                                <button @onclick="() => ConfirmarEliminar(ventas.VentaId)" class="w-20 btn btn-lg btn-success"><i class="bi bi-floppy" /> Agregar</button>
+                                <a href="/IndexVentas" class="w-20 btn btn-lg btn-primary ms-3"><i class="bi bi-arrow-left"></i> Cancelar</a>
                             </div>
                         </div>
                     </div>
@@ -134,15 +153,18 @@
 </EditForm>
 
 
+
 @code {
 
     [Parameter]
     public int Id { get; set; }
     public Ventas ventas = new Ventas();
     public int Producto { get; set; }
+    public bool Confirmacion = false;
     public int Cantidad { get; set; }
     public string Cliente { get; set; }
     public float PrecioVenta { get; set; }
+    public float Pago { get; set; }
     public int Borrar { get; set; }
     public IEnumerable<Productos> Productos = new List<Productos>();
     public IEnumerable<Cliente> cliente = new List<Cliente>();
@@ -157,6 +179,16 @@
         }
     }
 
+
+    private void Close()
+    {
+        Confirmacion = false;
+    }
+
+    private async Task ConfirmarEliminar(int id)
+    {
+        Confirmacion = true;
+    }
 
     public async Task Guardar()
     {
@@ -187,18 +219,47 @@
             return;
         }
         ventas.Cliente = Cliente;
-        foreach (var detalle in ventas.VentaDetalle)
+
+        if (string.IsNullOrWhiteSpace(ventas.FormaDePago))
         {
-            var producto = Productos.FirstOrDefault(p => p.ProductoId == detalle.ProductoId);
-            if (producto != null)
-            {
-                producto.Cantidad -= detalle.Cantidad;
-                await productosServices.PutProducto(producto.ProductoId, producto);
-            }
+            var mensajeError = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error al guardar",
+                    Detail = "Por favor seleccione una forma de pago",
+                    Duration = 3000
+                };
+            notificationServices.Notify(mensajeError);
+            return;
         }
 
-        // Guardar la venta
-        var response = await VentasServices.PostVentas(ventas);
+        if (ventas.FormaDePago == "Efectivo")
+        {
+            if (Pago <= 0)
+            {
+                var mensajeError = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error al guardar",
+                        Detail = "Por favor ingrese el monto de pago",
+                        Duration = 3000
+                    };
+                notificationServices.Notify(mensajeError);
+                return;
+            }
+
+            ventas.Devolucion = Pago - ventas.Total;
+            ventas.Cobrada = true;
+        }
+        else if (ventas.FormaDePago == "Crédito")
+        {
+            ventas.Devolucion = 0;
+            ventas.Cobrada = false;
+            ventas.Deuda = ventas.Total;
+        }
+
+
+        var response = await VentasServices.PutCompras(Id, ventas);
         if (response != null)
         {
             var Mensaje1 = new NotificationMessage
@@ -248,11 +309,9 @@
         {
             if (Cantidad <= productoSeleccionado.Cantidad)
             {
-                // Verificar si el detalle ya existe en la lista
                 var detalleExistente = ventas.VentaDetalle.FirstOrDefault(d => d.ProductoId == Producto);
                 if (detalleExistente != null)
                 {
-                    // Mostrar mensaje de error porque el detalle ya existe
                     var mensajeError = new NotificationMessage
                         {
                             Severity = NotificationSeverity.Error,

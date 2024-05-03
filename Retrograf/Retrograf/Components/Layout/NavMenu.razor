@@ -1,4 +1,5 @@
 ﻿@implements IDisposable
+@rendermode InteractiveServer
 
 @inject NavigationManager NavigationManager
 
@@ -14,33 +15,97 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                <a>
+                    Inicio
+                </a>
             </NavLink>
+        </div>
+        @*Productos*@
+        <div class="nav-item px-3">
+            <div class="nav-link dropdown-toggle" style="color: black" @onclick="() => Ex1 = !Ex1">
+                <a>
+                    Producto
+                </a>
+            </div>
+            @if (Ex1)
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link expand-menu " href="/IndexProductos">
+                        <a>
+                            Inventario
+                        </a>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link expand-menu " href="/CreateProducto">
+                        <a>
+                            Nuevo Producto
+                        </a>
+                    </NavLink>
+                </div>
+            }
         </div>
 
+
+        @*Ventas*@
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/IndexProductos">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Inventario
-            </NavLink>
+            <div class="nav-link dropdown-toggle" style="color: black" @onclick="() => Ex = !Ex">
+                <a>
+                    Ventas
+                </a>
+            </div>
+            @if (Ex)
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link expand-menu " href="/IndexVentas">
+                        <a>
+                            Listado Ventas
+                        </a>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link expand-menu " href="/CreateVentas">
+                        <a>
+                            Nueva Venta
+                        </a>
+                    </NavLink>
+                </div>
+            }
         </div>
 
+        @*Clientes*@
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/CreateProducto">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Producto
+            <div class="nav-link dropdown-toggle" style="color: black" @onclick="() => Ex2 = !Ex2">
+                <a>
+                    Cliente
+                </a>
+            </div>
+            @if (Ex2)
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link expand-menu " href="/ClientesIndex">
+                        <a>
+                            Listado Cliente
+                        </a>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link expand-menu " href="/CreateClientes">
+                        <a>
+                            Nuevo Cliente
+                        </a>
+                    </NavLink>
+                </div>
+            }
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/MenuCobrar">
+                <a>
+                    Cuentas por cobrar
+                </a>
             </NavLink>
         </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/CreateVentas">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Ventas
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/CreateClientes">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Clientes
-            </NavLink>
-        </div>
-
+        
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="auth">
                 <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
@@ -81,8 +146,12 @@
 </div>
 
 
+
 @code {
     private string? currentUrl;
+    private bool Ex;
+    private bool Ex1;
+    private bool Ex2;
 
     protected override void OnInitialized()
     {

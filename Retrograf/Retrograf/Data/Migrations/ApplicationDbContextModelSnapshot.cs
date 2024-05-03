@@ -155,6 +155,26 @@ namespace Retrograf.Migrations
                     b.ToTable("Facturas");
                 });
 
+            modelBuilder.Entity("Clases.ProductoMasVendido", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CantidadVendida")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductoMasVendido");
+                });
+
             modelBuilder.Entity("Clases.Productos", b =>
                 {
                     b.Property<int>("ProductoId")

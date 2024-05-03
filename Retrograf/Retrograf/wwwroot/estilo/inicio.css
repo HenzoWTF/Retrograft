@@ -1,0 +1,277 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lemonada:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fresca&display=swap');
+
+
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+}
+
+
+
+/* Inicio estilo de la cabecera del inicio */
+
+.cabecera {
+    background: linear-gradient(to left, #461d7cd2, #124d72);
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    border-radius: 0px 0px 20px 20px;
+}
+
+    .cabecera a {
+        color: #fff;
+        text-decoration: none;
+        margin-right: 10px;
+    }
+
+    .cabecera h1 {
+        font-size: 22px;
+        margin-bottom: 10px;
+        font-family: 'Arial', sans-serif;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+.social-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+    .social-buttons a {
+        color: #fff;
+        text-decoration: none;
+        margin-right: 10px;
+    }
+
+    .social-buttons img {
+        width: 30px;
+        height: 30px;
+        margin-right: 0px;
+        transition: opacity 0.3s ease;
+    }
+
+        .social-buttons img:hover {
+            opacity: 0.6;
+        }
+
+.contenedor-enlace {
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+    .contenedor-enlace .enlace {
+        border: 2.5px solid #18a161;
+        border-radius: 5px 0 0 5px;
+        padding: 5px;
+        font-family: monospace;
+    }
+
+    .contenedor-enlace .compartir {
+        background-color: #18a161;
+        color: #fff;
+        border: none;
+        border-radius: 0px 5px 5px 0px;
+        padding: 7.8px 10px;
+        cursor: pointer;
+    }
+
+.filaUnidas {
+    display: flex;
+    flex-wrap: wrap;
+    text-align: left;
+    margin-top: -25px;
+}
+
+.switcher {
+    width: 60px;
+}
+
+    .switcher span {
+        display: inline-block;
+        height: 20px;
+        width: 40px;
+        background-color: #ff002b;
+        border-radius: 20px;
+        position: relative;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+        .switcher span:before {
+            content: "";
+            position: absolute;
+            height: 16px;
+            width: 16px;
+            top: 2px;
+            left: 2px;
+            border-radius: 50%;
+            background-color: #ecf0f1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+    .switcher.Activo span {
+        background-color: #32CD32;
+    }
+
+        .switcher.Activo span:before {
+            transform: translateX(20px);
+        }
+
+/* Fin estilo de la cabecera del inicio */
+
+
+
+
+/* Inicio estilo para los bloques */
+
+.inicio {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-gap: 10px;
+    padding: 20px;
+}
+
+.bloque {
+    position: relative;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.productos-vendidos {
+    background: linear-gradient(35deg, #000000, #080076);
+}
+
+.gananciasT {
+    background: linear-gradient(35deg, #000000, #080076);
+}
+
+.deudasT {
+    background: linear-gradient(35deg, #000000, #080076);
+}
+
+.pedidos {
+    background: linear-gradient(35deg, #000000, #080076);
+}
+
+.productos {
+    background: linear-gradient(35deg, #000000, #080076);
+}
+
+.categorias {
+    background: linear-gradient(35deg, #000000, #080076);
+}
+
+
+
+.bloque h2 {
+    position: relative;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    z-index: 1;
+}
+
+.bloque p {
+    position: relative;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    margin: 5px 0px;
+    z-index: 1;
+}
+
+.bloque img {
+    width: 64px;
+    height: 64px;
+    position: absolute;
+    top: 50px;
+    right: 40px;
+    z-index: 0;
+}
+
+.bloque .descripcion {
+    position: relative;
+    font-size: 1rem;
+    z-index: 1;
+    max-width: 77%;
+}
+
+.detalles-ventas {
+    display: flex;
+    justify-content: space-between;
+}
+
+.detalle-venta:last-child {
+    margin-right: 0;
+}
+
+/* Fin estilo para los bloques */
+
+
+
+
+
+
+
+/* Inicio estilo para los graficos */
+.fila {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.chart-container {
+    width: 100%;
+    max-width: 550px;
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
+
+    .chart-container h2 {
+        font-weight: bold;
+        font-size: 20px;
+        text-align: center;
+    }
+
+.chart {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.circular {
+    max-height: 25rem;
+    margin-bottom: 20px;
+}
+
+/* Fin estilo para los graficos */
+
+
+
+
+
+
+/* Inicio estilo para la version moviles */
+
+@media (max-width: 768px) {
+
+    .inicio {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Fin estilo para la version moviles */

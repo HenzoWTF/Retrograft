@@ -8,7 +8,7 @@ namespace Retrograf.Services;
 
 public class ClienteServices(ApplicationDbContext context)
 {
-    public async Task<IEnumerable<Cliente>> GetClientes()
+    public async Task<List<Cliente>> GetClientes()
     {
         return await context.Clientes
         .Select(d => new Cliente()
