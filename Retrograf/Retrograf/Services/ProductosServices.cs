@@ -19,6 +19,7 @@ public class ProductosServices(ApplicationDbContext context)
             Cantidad = d.Cantidad,
             PrecioVenta = d.PrecioVenta,
             PrecioCompra = d.PrecioCompra,
+            Foto = d.Foto,
         }).ToListAsync();
     }
 
