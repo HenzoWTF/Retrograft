@@ -139,6 +139,26 @@
     }
 </script>
 
+<!-- Modal de advertencia -->
+<div class="modal fade" id="modalAdvertencia" tabindex="-1" role="dialog" aria-labelledby="modalAdvertenciaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAdvertenciaLabel">Productos con cantidad menor a 5</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Aquí se mostrarán los productos con cantidad menor a 5 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @code {
     public List<Ventas> ListaVentas = new List<Ventas>();
@@ -222,16 +242,26 @@
             .OrderBy(item => item.Fecha)
             .ToList();
 
-        // Convertir los datos en arreglos para el gráfico
-        var totalDeudasSemanaActual = deudasPorDia.Select(item => item.TotalDeudas).ToArray();
+            // Convertir los datos en arreglos para el gráfico
+            var totalDeudasSemanaActual = deudasPorDia.Select(item => item.TotalDeudas).ToArray();
 
-        // Invocar la función de JavaScript para graficar las deudas de clientes
-        await JSRuntime.InvokeVoidAsync("GraficarDeudasClientes", new object[] { totalDeudasSemanaActual, "Deudas de Clientes por día", fechasSemanaActual });
-    
+            // Invocar la función de JavaScript para graficar las deudas de clientes
+            await JSRuntime.InvokeVoidAsync("GraficarDeudasClientes", new object[] { totalDeudasSemanaActual, "Deudas de Clientes por día", fechasSemanaActual });
+
+             var productosConCantidadMenorA5 = ListaProductos.Where(p => p.Cantidad < 5).ToList();
+            if (productosConCantidadMenorA5.Any())
+            {
+                var mensajeAlerta = "Los siguientes productos tienen una cantidad menor a 5:\n";
+                foreach (var producto in productosConCantidadMenorA5)
+                {
+                    mensajeAlerta += $"{producto.Nombre}: {producto.Cantidad}\n";
+                }
+
+                await JSRuntime.InvokeVoidAsync("alert", mensajeAlerta);
+            }    
         
         }
 
     }
-
 
 }
