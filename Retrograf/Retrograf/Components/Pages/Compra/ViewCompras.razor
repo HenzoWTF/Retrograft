@@ -1,0 +1,108 @@
+﻿@page "/ViewCompra/{Id:int}"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@rendermode InteractiveServer
+@inject ComprasServices comprasServices
+@inject ProductosServices productosServices
+@inject NavigationManager navigationManager
+@inject NotificationService notificationServices
+@inject IJSRuntime JSRuntime
+@* @attribute [Authorize(Roles = "Admin")] *@
+
+<RadzenNotification />
+<PageTitle>View Compra</PageTitle>
+
+<div class="d-flex justify-content-center">
+    <img src="/Imagenes/Logo.png" alt="Logo de la aplicación" style="width:200px; height:auto; display: block;">
+</div>
+
+
+<section class=" gradient-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="fondo col-lg-6 col-xl-6" style="border-radius: 1rem;">
+
+                <div class="card-body p-5 text-center">
+                    <h1 class="fw-bold mb-2 text-uppercase">Ver compras</h1>
+
+                    <div class="tab-content">
+
+                        <div class="col-md-11 mx-auto">
+                            <div class="border-primary border border-2">
+                                <div class="card-body">
+                                    <ul class="list-unstyled" style="margin-top: 20px; margin-bottom: 20px;">
+                                        <li><strong>FechaCreacion:</strong> @Compras.FecheDeCompra.ToShortDateString()</li> 
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Productos -->
+                        <div class="col-md-11 mx-auto">
+                            <h3 class="text-center"><strong>Productos</strong></h3>
+                            @if (Compras.CompraDetalles.Count > 0)
+                            {
+                                <table class="table table-bordered miTabla">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio Compra</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var detalle in Compras.CompraDetalles)
+                                        {
+                                            <tr>
+                                                <td>@ObtenerProducto(detalle.ProductoId)</td>
+                                                <td>@detalle.Cantidad</td>
+                                                <td>@detalle.PrecioCompra</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                                <p><strong>Total de compras: </strong>@Compras.CompraDetalles.Count</p>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+
+                    <div class="d-flex justify-content-center mt-3">
+                        <td>
+                            <div>
+                                <a href="/CompraIndex" class="w-20 btn btn-outline-primary ms-3"><i class="bi bi-arrow-left"></i> Volver</a>
+                            </div>
+                        </td>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private Compra Compras { get; set; } = new Compra();
+    public IEnumerable<Productos> Productos = new List<Productos>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id > 0)
+        {
+            Productos = await productosServices.GetProductos();
+            Compras = await comprasServices.GetCompra(Id);
+        }
+    }
+
+    public string ObtenerProducto(int id)
+    {
+        var dato = Productos.FirstOrDefault(c => c.ProductoId == id);
+
+        return dato.Nombre;
+    }
+}
