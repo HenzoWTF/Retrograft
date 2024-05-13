@@ -8,7 +8,7 @@
     top: 0.5rem;
     right: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") no-repeat center/1.75rem rgba(255, 255, 255, 0.1);
+    background: black;
 }
 
 .navbar-toggler:checked {
@@ -60,7 +60,7 @@
     }
 
     .nav-item ::deep a.active {
-        background-color: rgba(255,255,255,0.37);
+        background-color: #808080;
         color: white;
     }
 
@@ -100,9 +100,9 @@
 
 
 .nav-scrollable {
-    background-color: #dddddd; /* Fondo gris */
-    padding: 10px; /* Espaciado interno */
-    border-radius: 5px; /* Bordes redondeados */
+    background-color: white;
+    padding: 1px; 
+    border-radius: 5px; 
 }
 
     .nav-scrollable nav.flex-column a {
@@ -117,7 +117,7 @@
             border-bottom: none; /* Eliminar línea divisoria del último elemento */
         }
         .nav-scrollable nav.flex-column a:hover {
-            color: white;
+            color: #3900ff;
         }
 .dropdown-toggle .bi.arrow {
     color: #000; /* Color negro */

@@ -98,6 +98,33 @@
                 </div>
             }
         </div>
+
+        @*Compra*@
+        <div class="nav-item px-3">
+            <div class="nav-link dropdown-toggle" style="color: black" @onclick="() => Ex3 = !Ex3">
+                <a>
+                    Compra
+                </a>
+            </div>
+            @if (Ex3)
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link expand-menu " href="/CompraIndex">
+                        <a>
+                            Listado Compra
+                        </a>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link expand-menu " href="/CreateCompras">
+                        <a>
+                            Nueva Compra
+                        </a>
+                    </NavLink>
+                </div>
+            }
+        </div>
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/MenuCobrar">
                 <a>
@@ -106,11 +133,6 @@
             </NavLink>
         </div>
         
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="auth">
-                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
-            </NavLink>
-        </div>
 
         <AuthorizeView>
             <Authorized>
@@ -152,6 +174,7 @@
     private bool Ex;
     private bool Ex1;
     private bool Ex2;
+    private bool Ex3;
 
     protected override void OnInitialized()
     {
