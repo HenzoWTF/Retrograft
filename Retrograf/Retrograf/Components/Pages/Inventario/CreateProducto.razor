@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
-@rendermode InteractiveServer
+@rendermode InteractiveAuto
 @inject ProductosServices productoService
 @inject NavigationManager navigationManager
 @inject NotificationService notificationServices
@@ -28,6 +28,10 @@
 
                         <div class="row tab-content">
                             <div class="mb-4">
+                                    <label>Foto del producto:</label>
+                                    <div class="input-group mb-3">
+                                        <InputFile OnChange="CargarImagen" class="form-control" accept=".png, .jpg, .jpeg"></InputFile>
+                                    </div>
                                 <div>
                                     <h4 class="fw-bold mb-2 ">Nombre:</h4>
                                     <div class="input-group">
@@ -108,5 +112,14 @@
             };
             notificationServices.Notify(errorMessage);
         }
+    }
+
+    public async Task CargarImagen(InputFileChangeEventArgs e)
+    {
+        var archivo = e.File;
+        var buffer = new byte[archivo.Size];
+
+        await archivo.OpenReadStream().ReadAsync(buffer);
+        producto.Foto = buffer;
     }
 }
