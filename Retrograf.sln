@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Retrograf", "Retrograf\Retrograf\Retrograf.csproj", "{BD17DA42-4F89-4E09-8125-ED240CC40469}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Retrograf", "Retrograf\Retrograf\Retrograf.csproj", "{BD17DA42-4F89-4E09-8125-ED240CC40469}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Retrograf.Client", "Retrograf\Retrograf.Client\Retrograf.Client.csproj", "{70B6F294-47D0-400A-9AC8-9518CE71251C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Retrograf.Client", "Retrograf\Retrograf.Client\Retrograf.Client.csproj", "{70B6F294-47D0-400A-9AC8-9518CE71251C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clases", "Clases\Clases.csproj", "{D5B4219A-E432-4AB2-B4B3-8A1661434177}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clases", "Clases\Clases.csproj", "{D5B4219A-E432-4AB2-B4B3-8A1661434177}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
