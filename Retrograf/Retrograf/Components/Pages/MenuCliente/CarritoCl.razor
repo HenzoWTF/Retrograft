@@ -1,0 +1,64 @@
+﻿@page "/carritoCompras"
+@inject CarritoServices CarritoServices
+@rendermode InteractiveServer
+
+<h3>Carrito de compras</h3>
+
+@if (Carrito != null && Carrito.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Carrito)
+            {
+                <tr>
+                    <td>@item.Nombre</td>
+                    <td>@item.Precio</td>
+                    <td>@item.Cantidad</td>
+                    <td>
+                        <button class="btn btn-outline-danger" @onclick="()=>Eliminar(item.ProductoId)"><i class="bi bi-trash-fill"/> Eliminar</button>
+                    </td>
+                    
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>El carrito de compras está vacío.</p>
+}
+
+@code
+{
+    private IEnumerable<Carrito> Carrito;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Carrito = await CarritoServices.GetCarritos();
+        StateHasChanged();
+    }
+    private async Task Eliminar(int Id)
+    {
+        if (Id != 0)
+        {
+            await CarritoServices.DeleteCarrito(Id);
+            var Mensaje = new NotificationMessage
+            {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Eliminacion exitosa",
+                    Detail = "Se a borrado el producto",
+                    Duration = 1_000
+                };
+            StateHasChanged();
+        }
+    }
+}
