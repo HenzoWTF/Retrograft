@@ -11,6 +11,18 @@ public class CuadreServices(ApplicationDbContext _context)
         _context.Cuadres.Add(cuadreDiario);
         await _context.SaveChangesAsync();
     }
+    public async Task GuardarCuadreEnBaseDeDatosSemanal(DateTime fecha)
+    {
+        var cuadreDiario = await CalcularCuadreSemanal(fecha);
+        _context.Cuadres.Add(cuadreDiario);
+        await _context.SaveChangesAsync();
+    }
+    public async Task GuardarCuadreEnBaseDeDatosMensual(DateTime fecha)
+    {
+        var cuadreDiario = await CalcularCuadreMensual(fecha);
+        _context.Cuadres.Add(cuadreDiario);
+        await _context.SaveChangesAsync();
+    }
 
     public async Task<Cuadre> CalcularCuadreDiario(DateTime fecha)
     {
@@ -22,6 +34,7 @@ public class CuadreServices(ApplicationDbContext _context)
         cuadre.Ingresos = await CalcularTotalIngresos(fecha);
         cuadre.Gastos = await CalcularTotalGastos(fecha);
         cuadre.Total = cuadre.Ingresos - cuadre.Gastos;
+        cuadre.Nombre = "diario";
 
         return cuadre;
     }
@@ -37,8 +50,9 @@ public class CuadreServices(ApplicationDbContext _context)
 
         cuadreSemana.Ingresos = await CalcularTotalIngresosSemana(fechaInicioSemana, fechaFinSemana);
         cuadreSemana.Gastos = await CalcularTotalGastosSemana(fechaInicioSemana, fechaFinSemana);
-
         cuadreSemana.Total = cuadreSemana.Ingresos - cuadreSemana.Gastos;
+        cuadreSemana.Nombre = "semanal";
+
         return cuadreSemana;
     }
     private async Task<float> CalcularTotalIngresos(DateTime fecha)
@@ -107,8 +121,9 @@ public class CuadreServices(ApplicationDbContext _context)
 
         cuadreMes.Ingresos = await CalcularTotalIngresosMes(primerDiaMes, ultimoDiaMes);
         cuadreMes.Gastos = await CalcularTotalGastosMes(primerDiaMes, ultimoDiaMes);
-
         cuadreMes.Total = cuadreMes.Ingresos - cuadreMes.Gastos;
+        cuadreMes.Nombre = "semanal"; 
+
         return cuadreMes;
     }
 

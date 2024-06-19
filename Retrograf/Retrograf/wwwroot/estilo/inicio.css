@@ -189,6 +189,12 @@ body {
 .categorias {
     background: linear-gradient(35deg, #000000, #080076);
 }
+.Ingresos {
+    background: linear-gradient(85deg, #0026ff, #0094ff);
+}
+.Gastos {
+    background: linear-gradient(85deg, #ff002b, #fff);
+}
 
 
 
