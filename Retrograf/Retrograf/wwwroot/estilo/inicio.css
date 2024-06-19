@@ -152,6 +152,16 @@ body {
     margin-bottom: 20px;
     color: #fff;
 }
+.bloqueC {
+    position: relative;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px; /* Reducir el padding para hacer el bloque más pequeño */
+    margin-bottom: 10px; /* Reducir el margen inferior */
+    font-size: 14px; /* Ajustar el tamaño de la fuente si es necesario */
+    color: #fff;
+}
+
 
 .productos-vendidos {
     background: linear-gradient(35deg, #000000, #080076);
@@ -167,6 +177,9 @@ body {
 
 .pedidos {
     background: linear-gradient(35deg, #000000, #080076);
+}
+.cuadre {
+    background: linear-gradient(35deg, #fff, #fff);
 }
 
 .productos {
@@ -246,6 +259,14 @@ body {
         font-size: 20px;
         text-align: center;
     }
+
+.chart-container-Center {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    margin-bottom: 1px;
+    float: center; /* Añadir float: left para alinear a la izquierda */
+}
 
 .chart {
     max-width: 100%;

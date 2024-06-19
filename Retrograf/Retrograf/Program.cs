@@ -41,6 +41,7 @@ builder.Services.AddScoped<VentasServices>();
 builder.Services.AddScoped<CuadreServices>();
 builder.Services.AddScoped<ClienteServices>();
 builder.Services.AddScoped<CarritoServices>();
+builder.Services.AddScoped<CuadreServices>();
 
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)

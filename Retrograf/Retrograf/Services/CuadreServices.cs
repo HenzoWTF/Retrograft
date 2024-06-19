@@ -96,4 +96,48 @@ public class CuadreServices(ApplicationDbContext _context)
 
         return totalGastosSemana;
     }
+
+    public async Task<Cuadre> CalcularCuadreMensual(DateTime primerDiaMes)
+    {
+        var ultimoDiaMes = primerDiaMes.AddMonths(1).AddDays(-1);
+        var cuadreMes = new Cuadre
+        {
+            FechaCuadre = primerDiaMes
+        };
+
+        cuadreMes.Ingresos = await CalcularTotalIngresosMes(primerDiaMes, ultimoDiaMes);
+        cuadreMes.Gastos = await CalcularTotalGastosMes(primerDiaMes, ultimoDiaMes);
+
+        cuadreMes.Total = cuadreMes.Ingresos - cuadreMes.Gastos;
+        return cuadreMes;
+    }
+
+    private async Task<float> CalcularTotalIngresosMes(DateTime primerDiaMes, DateTime ultimoDiaMes)
+    {
+        var ventasMes = await _context.Ventas
+            .Where(v => v.Fecha.Date >= primerDiaMes.Date && v.Fecha.Date <= ultimoDiaMes.Date)
+            .ToListAsync();
+
+        float totalVentasMes = ventasMes.Sum(v => v.Total);
+
+        return totalVentasMes;
+    }
+
+    private async Task<float> CalcularTotalGastosMes(DateTime primerDiaMes, DateTime ultimoDiaMes)
+    {
+        var comprasMes = await _context.Compras
+            .Include(c => c.CompraDetalles)
+            .Where(c => c.FecheDeCompra.Date >= primerDiaMes.Date && c.FecheDeCompra.Date <= ultimoDiaMes.Date)
+            .ToListAsync();
+
+        float totalGastosMes = 0;
+
+        foreach (var compra in comprasMes)
+        {
+            totalGastosMes += compra.CompraDetalles.Sum(cd => cd.PrecioCompra * cd.Cantidad);
+        }
+
+        return totalGastosMes;
+    }
+
 }

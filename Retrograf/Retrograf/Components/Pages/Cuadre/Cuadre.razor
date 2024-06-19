@@ -1,5 +1,6 @@
 ﻿@page "/Cuadre"
 @inject CuadreServices cuadreServices
+@inject VentasServices ventasService;
 @inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
 @using Microsoft.JSInterop
@@ -17,13 +18,75 @@
         <img src="./Imagenes/ProductosI.png" alt="ico">
         <h2>Gastos</h2>
         <p>@cuadre.Gastos</p>
-        <p class="descripcion"><span>Cantidad de productos en almacen</span></p>
+        <p class="descripcion"><span>Cantidad de gastos en la semana</span></p>
+    </div>
+    <div class="bloque cuadre">
+         <label class="text-dark">Opción:</label>
+                <select class="form-select mb-3" @bind="selectedOption">
+                    <option value="diario">Diario</option>
+                    <option value="semanal">Semanal</option>
+                    <option value="Mensual">Mensual</option>
+                </select>
+                <button class="btn btn-primary" @onclick="CalcularCuadre">Calcular</button>
+            
+            @if (cuadre != null)
+            {
+                <div>
+                    <h4>@(selectedOption == "diario" ? "Cuadre Diario" : selectedOption == "semanal" ? "Cuadre Semanal" : "Cuadre Mensual")</h4>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p class="fs-7 fw-bold text-dark">Fecha:</p>
+                        <p class="fs-7 text-dark">@cuadre.FechaCuadre.ToShortDateString()</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="fs-7 fw-bold text-dark">Ingresos:</p>
+                        <p class="fs-7 text-dark">@cuadre.Ingresos</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p class="fs-7 fw-bold text-dark">Gastos:</p>
+                        <p class="fs-7 text-dark">@cuadre.Gastos</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="fs-7 fw-bold text-dark">Total:</p>
+                        <p class="fs-7 text-dark">@cuadre.Total</p>
+                    </div>
+                </div>
+            }
+            </div>
     </div>
 
-    <div class="bloque grafico">
-        <canvas id="myChart" style="max-width: 600px; margin-top: 20px;"></canvas>
+<div class="chart-container-Center">
+    <div style="width:1000px; height:00px">
+        <canvas id="myChart"></canvas>
     </div>
 </div>
+
+<script>
+    window.Graficar = async (data) => {
+        const ctx = document.getElementById('myChart');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Ganancias y Pérdidas'
+                    }
+                }
+            }
+        });
+    };
+
+</script>
 
 @code {
     public string selectedOption = "diario";
@@ -31,18 +94,18 @@
     public List<Ventas> ListaVentas = new List<Ventas>();
     private bool cuadreRealizadoHoy = false;
 
-    protected override async Task OnAfterRenderAsync(bool verificador)
+    protected override async Task OnInitializedAsync()
     {
-        if (verificador)
-        {
-            var productoMasVendido = ListaVentas
-                .SelectMany(venta => venta.VentaDetalle)
-                .GroupBy(detalle => detalle.ProductoId)
-                .OrderByDescending(group => group.Sum(detalle => detalle.Cantidad))
-                .FirstOrDefault();
+        ActualizarGrafico();
+        // DateTime today = DateTime.Today;
+        // DateTime firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
+        // DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
 
-            await ActualizarGrafico();
-        }
+
+        // ListaVentas = (await ventasService.GetVentas())
+        //     .Where(venta => venta.Fecha >= firstDayOfMonth && venta.Fecha <= lastDayOfMonth)
+        //     .ToList();
+
     }
 
     private async Task ActualizarGrafico()
@@ -56,16 +119,19 @@
         if (selectedOption == "diario")
         {
             DateTime fecha = DateTime.Today;
+            cuadre.Nombre = "diario";
             cuadre = await cuadreServices.CalcularCuadreDiario(fecha);
         }
         else if (selectedOption == "semanal")
         {
             DateTime fechaInicioSemana = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+            cuadre.Nombre = "semanal";
             cuadre = await cuadreServices.CalcularCuadreSemanal(fechaInicioSemana);
         }
         else if (selectedOption == "mensual")
         {
             DateTime primerDiaMes = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            cuadre.Nombre = "mensual";
             cuadre = await cuadreServices.CalcularCuadreMensual(primerDiaMes);
         }
 
@@ -85,6 +151,7 @@
 
     private async Task CalcularCuadre()
     {
+        
         if (!cuadreRealizadoHoy)
         {
             if (selectedOption == "diario")

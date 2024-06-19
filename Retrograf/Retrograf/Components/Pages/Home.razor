@@ -213,18 +213,18 @@
             }
 
 
-            // Calcula el rango de fechas para la semana actual
+            //Rango de fechas para la semana actual
             DateTime today = DateTime.Today;
             int currentDayOfWeek = (int)today.DayOfWeek;
             DateTime startOfWeek = today.AddDays(-currentDayOfWeek);
             DateTime endOfWeek = startOfWeek.AddDays(6);
 
-            // Filtra las ventas para obtener solo las de la semana actual
+            // Semana actual
             var ventasSemanaActual = ListaVentas
                 .Where(venta => venta.Fecha >= startOfWeek && venta.Fecha <= endOfWeek)
                 .ToList();
 
-            // Calcula las ventas totales por día de la semana actual
+
             var datosVentasSemanaActual = ventasSemanaActual
                 .GroupBy(venta => venta.Fecha.Date)
                 .Select(group => new { Fecha = group.Key, CantidadVentas = group.Count() })
