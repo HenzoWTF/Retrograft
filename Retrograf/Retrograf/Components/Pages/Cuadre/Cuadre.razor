@@ -1,0 +1,111 @@
+﻿@page "/Cuadre"
+@inject CuadreServices cuadreServices
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+@using Microsoft.JSInterop
+
+<PageTitle>Cuadre</PageTitle>
+
+<div class="inicio">
+    <div class="bloque productos-vendidos">
+        <img src="./Imagenes/Ventas.png" alt="ico">
+        <h2>Ingresos</h2>
+        <p>@cuadre.Ingresos</p>
+        <p class="descripcion">Cantidad de ventas en esta semana</p>
+    </div>
+    <div class="bloque gananciasT">
+        <img src="./Imagenes/ProductosI.png" alt="ico">
+        <h2>Gastos</h2>
+        <p>@cuadre.Gastos</p>
+        <p class="descripcion"><span>Cantidad de productos en almacen</span></p>
+    </div>
+
+    <div class="bloque grafico">
+        <canvas id="myChart" style="max-width: 600px; margin-top: 20px;"></canvas>
+    </div>
+</div>
+
+@code {
+    public string selectedOption = "diario";
+    public Clases.Cuadre cuadre = new Clases.Cuadre();
+    public List<Ventas> ListaVentas = new List<Ventas>();
+    private bool cuadreRealizadoHoy = false;
+
+    protected override async Task OnAfterRenderAsync(bool verificador)
+    {
+        if (verificador)
+        {
+            var productoMasVendido = ListaVentas
+                .SelectMany(venta => venta.VentaDetalle)
+                .GroupBy(detalle => detalle.ProductoId)
+                .OrderByDescending(group => group.Sum(detalle => detalle.Cantidad))
+                .FirstOrDefault();
+
+            await ActualizarGrafico();
+        }
+    }
+
+    private async Task ActualizarGrafico()
+    {
+        var data = await ObtenerDatosGrafico();
+        await JSRuntime.InvokeVoidAsync("Graficar", data);
+    }
+
+    private async Task<object> ObtenerDatosGrafico()
+    {
+        if (selectedOption == "diario")
+        {
+            DateTime fecha = DateTime.Today;
+            cuadre = await cuadreServices.CalcularCuadreDiario(fecha);
+        }
+        else if (selectedOption == "semanal")
+        {
+            DateTime fechaInicioSemana = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+            cuadre = await cuadreServices.CalcularCuadreSemanal(fechaInicioSemana);
+        }
+        else if (selectedOption == "mensual")
+        {
+            DateTime primerDiaMes = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            cuadre = await cuadreServices.CalcularCuadreMensual(primerDiaMes);
+        }
+
+        // Aquí se debe preparar los datos para el gráfico
+        var data = new
+        {
+            labels = new[] { "Ingresos", "Gastos" },
+            datasets = new[]
+            {
+                new { label = "Ingresos", data = new[] { cuadre.Ingresos } },
+                new { label = "Gastos", data = new[] { cuadre.Gastos } }
+            }
+        };
+
+        return data;
+    }
+
+    private async Task CalcularCuadre()
+    {
+        if (!cuadreRealizadoHoy)
+        {
+            if (selectedOption == "diario")
+            {
+                DateTime fecha = DateTime.Today;
+                cuadre = await cuadreServices.CalcularCuadreDiario(fecha);
+                await cuadreServices.GuardarCuadreEnBaseDeDatos(fecha);
+            }
+            else if (selectedOption == "semanal")
+            {
+                DateTime fechaInicioSemana = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+                cuadre = await cuadreServices.CalcularCuadreSemanal(fechaInicioSemana);
+                await cuadreServices.GuardarCuadreEnBaseDeDatos(fechaInicioSemana);
+            }
+            else if (selectedOption == "mensual")
+            {
+                DateTime primerDiaMes = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+                cuadre = await cuadreServices.CalcularCuadreMensual(primerDiaMes);
+                await cuadreServices.GuardarCuadreEnBaseDeDatos(primerDiaMes);
+            }
+            cuadreRealizadoHoy = true;
+        }
+    }
+}
