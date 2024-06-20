@@ -3,139 +3,139 @@
 
 @inject NavigationManager NavigationManager
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Retrograf</a>
-    </div>
-</div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <a>
-                    Inicio
-                </a>
-            </NavLink>
-        </div>
-        @*Productos*@
-        <div class="nav-item px-3">
-            <div class="nav-link dropdown-toggle" style="color: black" @onclick="() => Ex1 = !Ex1">
-                <a>
-                    Producto
-                </a>
+<AuthorizeView>
+    <Authorized>
+        <div class="top-row ps-3 navbar navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="">Retrograf</a>
             </div>
-            @if (Ex1)
-            {
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link expand-menu " href="/IndexProductos">
-                        <a>
-                            Inventario
-                        </a>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link expand-menu " href="/CreateProducto">
-                        <a>
-                            Nuevo Producto
-                        </a>
-                    </NavLink>
-                </div>
-            }
         </div>
 
+        <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
-        @*Ventas*@
-        <div class="nav-item px-3">
-            <div class="nav-link dropdown-toggle" style="color: black" @onclick="() => Ex = !Ex">
-                <a>
-                    Ventas
-                </a>
-            </div>
-            @if (Ex)
-            {
+        <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+            <nav class="flex-column">
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link expand-menu " href="/IndexVentas">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                         <a>
-                            Listado Ventas
+                            Inicio
                         </a>
                     </NavLink>
                 </div>
+                @*Productos*@
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link expand-menu " href="/CreateVentas">
+                    <div class="nav-link dropdown-toggle" style="color: black" @onclick="() => Ex1 = !Ex1">
                         <a>
-                            Nueva Venta
+                            Producto
                         </a>
-                    </NavLink>
+                    </div>
+                    @if (Ex1)
+                    {
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link expand-menu " href="/IndexProductos">
+                                <a>
+                                    Inventario
+                                </a>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link expand-menu " href="/CreateProducto">
+                                <a>
+                                    Nuevo Producto
+                                </a>
+                            </NavLink>
+                        </div>
+                    }
                 </div>
-            }
-        </div>
 
-        @*Clientes*@
-        <div class="nav-item px-3">
-            <div class="nav-link dropdown-toggle" style="color: black" @onclick="() => Ex2 = !Ex2">
-                <a>
-                    Cliente
-                </a>
-            </div>
-            @if (Ex2)
-            {
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link expand-menu " href="/ClientesIndex">
-                        <a>
-                            Listado Cliente
-                        </a>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link expand-menu " href="/CreateClientes">
-                        <a>
-                            Nuevo Cliente
-                        </a>
-                    </NavLink>
-                </div>
-            }
-        </div>
 
-        @*Compra*@
-        <div class="nav-item px-3">
-            <div class="nav-link dropdown-toggle" style="color: black" @onclick="() => Ex3 = !Ex3">
-                <a>
-                    Compra
-                </a>
-            </div>
-            @if (Ex3)
-            {
+                @*Ventas*@
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link expand-menu " href="/CompraIndex">
+                    <div class="nav-link dropdown-toggle" style="color: black" @onclick="() => Ex = !Ex">
                         <a>
-                            Listado Compra
+                            Ventas
+                        </a>
+                    </div>
+                    @if (Ex)
+                    {
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link expand-menu " href="/IndexVentas">
+                                <a>
+                                    Listado Ventas
+                                </a>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link expand-menu " href="/CreateVentas">
+                                <a>
+                                    Nueva Venta
+                                </a>
+                            </NavLink>
+                        </div>
+                    }
+                </div>
+
+                @*Clientes*@
+                <div class="nav-item px-3">
+                    <div class="nav-link dropdown-toggle" style="color: black" @onclick="() => Ex2 = !Ex2">
+                        <a>
+                            Cliente
+                        </a>
+                    </div>
+                    @if (Ex2)
+                    {
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link expand-menu " href="/ClientesIndex">
+                                <a>
+                                    Listado Cliente
+                                </a>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link expand-menu " href="/CreateClientes">
+                                <a>
+                                    Nuevo Cliente
+                                </a>
+                            </NavLink>
+                        </div>
+                    }
+                </div>
+
+                @*Compra*@
+                <div class="nav-item px-3">
+                    <div class="nav-link dropdown-toggle" style="color: black" @onclick="() => Ex3 = !Ex3">
+                        <a>
+                            Compra
+                        </a>
+                    </div>
+                    @if (Ex3)
+                    {
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link expand-menu " href="/CompraIndex">
+                                <a>
+                                    Listado Compra
+                                </a>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link expand-menu " href="/CreateCompras">
+                                <a>
+                                    Nueva Compra
+                                </a>
+                            </NavLink>
+                        </div>
+                    }
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/MenuCobrar">
+                        <a>
+                            Cuentas por cobrar
                         </a>
                     </NavLink>
                 </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link expand-menu " href="/CreateCompras">
-                        <a>
-                            Nueva Compra
-                        </a>
-                    </NavLink>
-                </div>
-            }
-        </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/MenuCobrar">
-                <a>
-                    Cuentas por cobrar
-                </a>
-            </NavLink>
-        </div>
-        
 
-        <AuthorizeView>
-            <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Manage">
                         <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
@@ -150,24 +150,11 @@
                         </button>
                     </form>
                 </div>
-            </Authorized>
-            <NotAuthorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Register">
-                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Login">
-                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
-                    </NavLink>
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
-    </nav>
-</div>
+            </nav>
+        </div>
 
-
+    </Authorized>
+</AuthorizeView>
 
 @code {
     private string? currentUrl;
