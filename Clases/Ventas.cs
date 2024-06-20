@@ -17,7 +17,12 @@ public class Ventas
     public DateTime Fecha { get; set; } = DateTime.Today;
 
     [Range(1, int.MaxValue, ErrorMessage = "El campo debe ser mayor que cero")]
-    public float Valor { get; set; }
+    public float Total { get; set; }
+    public bool Cobrada { get; set; }
+    public float Deuda { get; set; }
+    public float Devolucion { get; set; }
+    public string FormaDePago { get; set; }
+    public string Cliente { get; set; }
 
     [ForeignKey("VentaId")]
     public List<VentaDetalle> VentaDetalle { get; set; } = new List<VentaDetalle>();

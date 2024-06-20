@@ -1,0 +1,119 @@
+﻿@page "/ClientesIndex"
+@using Microsoft.AspNetCore.Authorization
+@inject ClienteServices ClientesServices
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+@* @attribute [Authorize(Roles = "Admin")] *@
+
+<PageTitle>Clientes</PageTitle>
+<div class="d-flex justify-content-center">
+    <img src="/Imagenes/Logo.png" alt="Logo de la aplicación" style="width:200px; height:auto; display: block;">
+</div>
+
+
+<section class=" gradient-custom">
+    <div class="container py-2 h-100">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="fondo" style="border-radius: 1rem;">
+                <h2 class="fw-bold mb-2 text-center">Cliente</h2>
+
+                <div class="card-body p-1 justify-content-center">
+
+                    <div class="row">
+                        <div class="col-8">
+
+                            @* Fechas *@
+                            <h4>Filtrar Clientes</h4>
+                            <div class='row'>
+                                <div class='col-4'>
+                                    <label>Nombre</label>
+                                    <div class="input-group mb-3">
+                                        <input id="criterioBusqueda" type="text" class="form-control" @bind="criterio" />
+                                        <button type="button" @onclick="Filtrar" class="btn btn-outline-primary bi bi-search"></button>
+                                    </div>
+                                </div>
+                                <div class='col-4'>
+                                    <label>Fecha de Registro Desde</label>
+                                    <InputDate @bind-Value="FechaInicial" class="form-control"></InputDate>
+                                </div>
+                                <div class='col-4'>
+                                    <label>Fecha de Registro Hasta</label>
+                                    <InputDate @bind-Value="FechaFinal" class="form-control"></InputDate>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 justify-content-center">
+                            <label>Cantidad de productos:</label>
+                            <span class="badge bg-secondary">@ClientesList.Count()</span>
+                        </div>
+                    </div>
+
+                    <div class="tab-content">
+                        <form>
+
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Direcci&oacute;n</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var cliente in ClientesList.Where(c => (string.IsNullOrEmpty(criterio) || c.NombreCliente.Contains(criterio))))
+                                    {
+                                        <tr>
+                                            <td>@cliente.NombreCliente</td>
+                                            <td>@cliente.DireccionCliente</td>
+                                            <td>
+                                                <a href="/EditClientes/@cliente.IdCliente" class="btn btn-outline-primary"><i class="bi bi-pencil-fill"></i> Editar</a>
+                                                <a href="/ViewClientes/@cliente.IdCliente" class="btn btn-outline-primary"><i class="bi bi-eye"></i> Ver</a>
+                                                <a href="/DeleteCliente/@cliente.IdCliente" class="btn btn-outline-danger"><i class="bi bi-trash-fill"></i> Eliminar</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+
+                            </table>
+                            <div>
+                                <button type="button" @onclick="ReiniciarFiltro" class="btn btn-outline-secondary bi bi-arrow-clockwise"> Reiniciar Filtro</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@code {
+    public List<Cliente> ClientesList { get; set; } = new List<Cliente>();
+    public string criterio { get; set; } = string.Empty;
+    public DateTime FechaInicial { get; set; } = DateTime.Today.AddDays(-7); // Default: 7 días atrás
+    public DateTime FechaFinal { get; set; } = DateTime.Today;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Filtrar();
+    }
+
+    async Task Filtrar()
+    {
+        ClientesList = await ClientesServices.GetList(cliente =>
+            (string.IsNullOrEmpty(criterio) || cliente.NombreCliente.Contains(criterio)));
+    }
+
+    void ReiniciarFiltro()
+    {
+        criterio = string.Empty;
+        FechaInicial = DateTime.Today.AddDays(-7);
+        FechaFinal = DateTime.Today;
+        Filtrar();
+    }
+
+}

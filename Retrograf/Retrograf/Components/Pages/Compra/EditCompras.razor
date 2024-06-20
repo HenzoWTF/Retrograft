@@ -1,0 +1,277 @@
+﻿@page "/EditCompra/{Id:int}"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@rendermode InteractiveServer
+@inject ComprasServices comprasServices
+@inject ProductosServices productosServices
+@inject NavigationManager navigationManager
+@inject NotificationService notificationServices
+@inject IJSRuntime JSRuntime
+@* @attribute [Authorize(Roles = "Admin")] *@
+
+
+<RadzenNotification />
+<PageTitle>View Compra</PageTitle>
+<div class="d-flex justify-content-center">
+    <img src="/Imagenes/Logo.png" alt="Logo de la aplicación" style="width:200px; height:auto; display: block;">
+</div>
+
+<EditForm Model="@Compras" OnValidSubmit="Guardar" FormName="Compras">
+    <DataAnnotationsValidator />
+
+    <section class="vh-100 gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center">
+                <div class="fondo col-lg-6 col-xl-6 " style="border-radius: 2rem;">
+
+                    <div class="card-body p-5">
+                        <h2 class="fw-bold mb-2 text-uppercase text-center">Editar compra</h2>
+
+                        <div class="row tab-content">
+                            <div class="row mb-3">
+                                <div class="col-4">
+                                    @*FechaCreacion*@
+                                    <label class="form-label" for="fechaCreacion"><strong>Fecha Creaci&oacute;n:</strong></label>
+                                    <InputDate id="fechaCreacion" class="form-control" @bind-Value="Compras.FecheDeCompra" readonly></InputDate>
+                                </div>
+                            </div>
+
+
+                            @*ProveedoresDetalles*@
+                            <fieldset class="border-primmary border border-2">
+                                @*Body*@
+                                <div class="card-body">
+                                    <section class="row mb-4">
+                                        <h3><strong>Detalles</strong></h3>
+                                        <div class="row align-content-center">
+
+                                            <div class="col-md-6">
+                                                <label>Productos:</label>
+                                                <InputSelect id="Productos" class="form-select" @bind-Value="Producto">
+                                                    <option value="">Seleccionar Productos</option>
+                                                    @foreach (var item in Productos)
+                                                    {
+                                                        <option value="@item.ProductoId">@item.Nombre</option>
+                                                    }
+                                                </InputSelect>
+
+                                            </div>
+
+                                            @*Cantidad*@
+                                            <div class="col-4">
+                                                <label class="form-label" for="Cantidad"><strong>Cantidad:</strong></label>
+                                                <InputNumber id="cantidad" class="form-control" @bind-Value="Cantidad" placeholder="Ingrese un número para la cantidad"></InputNumber>
+                                            </div>
+
+                                            @*Precio Compra*@
+                                            <div class="col-4">
+                                                <label class="form-label" for="PrecioCompra"><strong>Precio Compra:</strong></label>
+                                                <InputNumber id="PrecioCompra" class="form-control" @bind-Value="PrecioCompra" placeholder="Ingrese el precio del producto"></InputNumber>
+                                            </div>
+                                            @*Boton*@
+                                            <div class="col-4 d-flex align-items-end">
+                                                <button type="button" class="btn btn-outline-success" @onclick="AgregarDetalle"><i class="bi bi-plus-circle" /> Agregar</button>
+                                            </div>
+                                        </div>
+                                    </section>
+                                    <section>
+                                        @if (Compras.CompraDetalles.Count > 0)
+                                        {
+                                            @*Table Detalles*@
+                                            <table class="table table-bordered miTabla">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Producto</th>
+                                                        <th>Cantidad</th>
+                                                        <th>Precio Compra</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var detalle in Compras.CompraDetalles)
+                                                    {
+                                                        <tr>
+                                                            <td>@ObtenerProducto(detalle.ProductoId)</td>
+                                                            <td>@detalle.Cantidad</td>
+                                                            <td>@detalle.PrecioCompra</td>
+                                                            <td><button type="button" class="btn btn-outline-danger" @onclick="()=> EliminarDetalle(detalle)"><i class="bi bi-trash3-fill" /></button></td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                            <p><strong>Total de Productos: </strong>@Compras.CompraDetalles.Count</p>
+                                        }
+                                    </section>
+                                </div>
+                            </fieldset>
+
+                            <div class="d-flex justify-content-center mt-3">
+                                <button type="submit" class="w-20 btn btn-lg btn-success"><i class="bi bi-floppy"></i> Agregar</button>
+                                <a href="/CompraIndex" class="w-20 btn btn-lg btn-primary ms-3"><i class="bi bi-arrow-left"></i> Cancelar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public Compra Compras = new Compra();
+    public IEnumerable<Productos> Productos = new List<Productos>();
+    public int Producto { get; set; }
+    public float PrecioCompra { get; set; }
+    public int Cantidad { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Compras = await comprasServices.GetCompra(Id);
+        Productos = await productosServices.GetProductos();
+
+    }
+    public async Task Guardar()
+    {
+        if (Compras.CompraDetalles.Count == 0)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error al guardar",
+                    Detail = "No se han agregado detalles de compra",
+                    Duration = 4000
+                };
+            notificationServices.Notify(mensaje);
+            return;
+        }
+
+        if (Compras.CompraDetalles.Any(detalle =>
+            detalle.ProductoId == 0 || detalle.Cantidad <= 0 || detalle.PrecioCompra <= 0))
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error al guardar",
+                    Detail = "Se han ingresado detalles de compra incompletos o inválidos",
+                    Duration = 1000
+                };
+            notificationServices.Notify(mensaje);
+            return;
+        }
+
+        foreach (var detalle in Compras.CompraDetalles)
+        {
+            var producto = Productos.FirstOrDefault(p => p.ProductoId == detalle.ProductoId);
+            if (producto != null)
+            {
+                producto.Cantidad += detalle.Cantidad;
+                producto.PrecioCompra = detalle.PrecioCompra;
+                await productosServices.PutProducto(producto.ProductoId, producto);
+            }
+        }
+
+        var response = await comprasServices.PostCompras(Compras);
+        if (response != null)
+        {
+            var Mensaje1 = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Guardado",
+                    Detail = "Contacto guardado con exito",
+                    Duration = 1000
+                };
+            notificationServices.Notify(Mensaje1);
+            await Task.Delay(1000);
+            navigationManager.NavigateTo("/CompraIndex");
+        }
+        else
+        {
+            var Mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error al guardar",
+                    Detail = "Ha ocurrido un error",
+                    Duration = 1_000
+                };
+            notificationServices.Notify(Mensaje);
+        }
+    }
+
+    public string ObtenerProducto(int id)
+    {
+        var dato = Productos.FirstOrDefault(c => c.ProductoId == id);
+
+        return dato.Nombre;
+    }
+
+
+    public async Task AgregarDetalle()
+    {
+        if (await ValidarDetalle())
+        {
+            var nuevoDetalle = new CompraDetalle
+                {
+                    ProductoId = Producto,
+                    Cantidad = Cantidad,
+                    PrecioCompra = PrecioCompra
+                };
+            Compras.CompraDetalles.Add(nuevoDetalle);
+            StateHasChanged();
+        }
+        else
+        {
+            var Mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Info,
+                    Summary = "Error al guardar",
+                    Detail = "Debe rellenar todos los campos",
+                    Duration = 1_000
+                };
+            notificationServices.Notify(Mensaje);
+
+        }
+    }
+
+    public async Task<bool> ValidarDetalle()
+    {
+        var validar = await comprasServices.GetCompras();
+
+        if (Cantidad < 0)
+            return false;
+
+        foreach (var detalle in validar)
+        {
+            foreach (var contactos in detalle.CompraDetalles)
+            {
+                if (contactos.ProductoId == Producto)
+                    return false;
+            }
+        }
+
+        foreach (var detalle in Compras.CompraDetalles)
+        {
+            if (detalle.ProductoId == Producto)
+                return false;
+        }
+
+        return true;
+    }
+
+    public async Task EliminarDetalle(CompraDetalle detalle)
+    {
+        Compras.CompraDetalles.Remove(detalle);
+        var Mensaje = new NotificationMessage
+            {
+                Severity = NotificationSeverity.Info,
+                Summary = "Detalle eliminado",
+                Detail = "Detalle eliminado",
+                Duration = 1_000
+            };
+        notificationServices.Notify(Mensaje);
+    }
+}

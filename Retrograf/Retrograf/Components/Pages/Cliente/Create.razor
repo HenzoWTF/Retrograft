@@ -1,0 +1,83 @@
+﻿@page "/CreateClientes"
+@inject ClienteServices ClientesServices
+@inject NavigationManager navigationManager
+@inject NotificationService notificationServices
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+@* @attribute [Authorize(Roles = "Admin")] *@
+
+
+<PageTitle>Registro de Clientes</PageTitle>
+<RadzenNotification />
+<div class="d-flex justify-content-center">
+    <img src="/Imagenes/Logo.png" alt="Logo de la aplicación" style="width:200px; height:auto; display: block;">
+</div>
+
+
+<EditForm Model="cliente" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <section class="vh-100 gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center">
+                <div class="fondo col-lg-6 col-xl-6 " style="border-radius: 2rem;">
+
+                    <div class="card-body p-5">
+
+                        <div class="row tab-content">
+                            <div class="mb-4">
+                                <h2 class="fw-bold mb-2 text-center">Crear cliente</h2>
+                                <div >
+                                    <!-- Para el nombre -->
+                                    <label class="form-label">Nombre</label>
+                                    <InputText @bind-Value="cliente.NombreCliente" class="form-control" placeholder=" Nombre " />
+                                    <ValidationMessage For="@(() => cliente.NombreCliente)" />
+                                </div>
+
+                                <div>
+                                    <!-- Para la fecha -->
+                                    <label class="form-label">Direcci&oacute;n</label>
+                                    <InputText @bind-Value="cliente.DireccionCliente" class="form-control" />
+                                    <ValidationMessage For="@(() => cliente.DireccionCliente)" />
+                                </div>
+                                <div class="d-flex justify-content-center mt-3">
+                                    <button type="submit" class="w-20 btn btn-lg btn-success"><i class="bi bi-floppy"></i> Guardar</button>
+                                    <a href="/ClientesIndex" class="w-20 btn btn-lg btn-primary ms-3"><i class="bi bi-arrow-left"></i> Cancelar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>            
+    </section>
+</EditForm>
+
+@code {
+    public Cliente cliente { get; set; } = new Cliente();
+
+    async Task Guardar()
+    {
+        var response = await ClientesServices.PostClientes(cliente);
+        if (response != null)
+        {
+            var successMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Guardado",
+                    Detail = "Producto guardado con éxito",
+                    Duration = 1000
+                };
+            notificationServices.Notify(successMessage);
+
+
+            navigationManager.NavigateTo("/ClientesIndex");
+            Nuevo();
+        }
+    }
+
+    void Nuevo()
+    {
+        cliente = new Cliente();
+    }
+}

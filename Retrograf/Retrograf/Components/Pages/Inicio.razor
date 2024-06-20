@@ -1,0 +1,267 @@
+﻿@page "/Inicio"
+
+<PageTitle>Home</PageTitle>
+
+<div class="d-flex justify-content-center">
+    <img src="/Imagenes/Logo.png" alt="Logo de la aplicación" style="width:200px; height:auto; display: block;">
+</div>
+
+@inject VentasServices ventasService;
+@inject ProductosServices ProductoService;
+@inject ClienteServices ClienteService;
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+@using Microsoft.JSInterop
+
+
+<div class="inicio">
+    <div class="bloque productos-vendidos">
+        <img src="./Imagenes/Ventas.png" alt="ico">
+        <h2>Ventas totales</h2>
+        <p>@VentasTotales</p>
+        <p class="descripcion">Cantidad de ventas en esta semana</p>
+    </div>
+    <div class="bloque gananciasT">
+        <img src="./Imagenes/ProductosI.png" alt="ico">
+        <h2>Productos</h2>
+        <p>@cantidadProductos</p>
+        <p class="descripcion"><span>Cantidad de productos en almacen</span></p>
+    </div>
+    <div class="bloque deudasT">
+        <img src="./Imagenes/ClientesI.png" alt="ico">
+        <h2>Clientes totales</h2>
+        <p>@cantidadclientes</p>
+        <p class="descripcion"><span>Cantidad de clientes</span></p>
+    </div>
+    <div class="bloque deudasT">
+        <img src="./Imagenes/Cobrar.png" alt="ico">
+        <h2>Cuentas por cobrar</h2>
+        <p>@cantidadDeudas</p>
+        <p class="descripcion"><span>Cantidad de cuentas pendientes</span></p>
+    </div>
+</div>
+
+
+<div class="fila">
+    <div class="chart-container">
+        <h2>Producto más vendido</h2>
+        <div style="width:550px; height:auto">
+            <canvas id="myChart"></canvas>
+        </div>
+
+    </div>
+
+    <div class="chart-container">
+        <h2>Ventas TOTALES</h2>
+        <div style="width:550px; height:auto">
+            <canvas id="myChartVe"></canvas>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h2>CLIENTES TOTALES</h2>
+        <div style="width:550px; height: auto">
+            <canvas id="deudasClientes"></canvas>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    window.Graficar = async (datos, titulo, columnas) => {
+        const ctx = document.getElementById('myChart');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: columnas,
+                datasets: [{
+                    label: titulo,
+                    data: datos,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    window.GraficarV = async (datos, titulo, columnas) => {
+        const ctx = document.getElementById('myChartVe');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: columnas,
+                datasets: [{
+                    label: titulo,
+                    data: datos,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+
+    window.GraficarDeudasClientes = async (datos, titulo, columnas) => {
+        const ctx = document.getElementById('deudasClientes');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: columnas,
+                datasets: [{
+                    label: titulo,
+                    data: datos,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+</script>
+
+<!-- Modal de advertencia -->
+<div class="modal fade" id="modalAdvertencia" tabindex="-1" role="dialog" aria-labelledby="modalAdvertenciaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAdvertenciaLabel">Productos con cantidad menor a 5</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Aquí se mostrarán los productos con cantidad menor a 5 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    public List<Ventas> ListaVentas = new List<Ventas>();
+    public List<Ventas> ListaVentasDeuda = new List<Ventas>();
+    public List<Productos> ListaProductos = new List<Productos>();
+    public List<Clases.Cliente> ListaClientes = new List<Clases.Cliente>();
+
+
+    int VentasTotales = 0, cantidadProductos = 0, cantidadDeudas = 0, cantidadclientes = 0;
+    protected override async Task OnInitializedAsync()
+    {
+        DateTime today = DateTime.Today;
+        int currentDayOfWeek = (int)today.DayOfWeek;
+        DateTime startOfWeek = today.AddDays(-currentDayOfWeek);
+        DateTime endOfWeek = startOfWeek.AddDays(6);
+
+        ListaVentas = (await ventasService.GetVentas())
+            .Where(venta => venta.Fecha >= startOfWeek && venta.Fecha <= endOfWeek)
+            .ToList();
+
+        VentasTotales = ListaVentas.Count;
+
+        ListaProductos = await ProductoService.GetProductos();
+        cantidadProductos = ListaProductos.Count;
+
+        ListaClientes = await ClienteService.GetClientes();
+        cantidadclientes = ListaClientes.Count;
+
+        ListaVentasDeuda = await ventasService.GetVentasDeudas();
+        cantidadDeudas = ListaVentasDeuda.Count;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool verificador)
+    {
+        if (verificador)
+        {
+            var productoMasVendido = ListaVentas
+                .SelectMany(venta => venta.VentaDetalle)
+                .GroupBy(detalle => detalle.ProductoId)
+                .OrderByDescending(group => group.Sum(detalle => detalle.Cantidad))
+                .FirstOrDefault(); 
+
+            if (productoMasVendido != null)
+            {
+                var nombreProductoMasVendido = ListaProductos.FirstOrDefault(p => p.ProductoId == productoMasVendido.Key)?.Nombre;
+                var cantidadVentasProductoMasVendido = productoMasVendido.Sum(detalle => detalle.Cantidad);
+
+                // Invocar la función de JavaScript para dibujar el gráfico solo con el producto más vendido
+                await JSRuntime.InvokeVoidAsync("Graficar", new[] { cantidadVentasProductoMasVendido }, "Producto más vendido", new[] { nombreProductoMasVendido });
+
+
+            }
+
+
+            //Rango de fechas para la semana actual
+            DateTime today = DateTime.Today;
+            int currentDayOfWeek = (int)today.DayOfWeek;
+            DateTime startOfWeek = today.AddDays(-currentDayOfWeek);
+            DateTime endOfWeek = startOfWeek.AddDays(6);
+
+            // Semana actual
+            var ventasSemanaActual = ListaVentas
+                .Where(venta => venta.Fecha >= startOfWeek && venta.Fecha <= endOfWeek)
+                .ToList();
+
+
+            var datosVentasSemanaActual = ventasSemanaActual
+                .GroupBy(venta => venta.Fecha.Date)
+                .Select(group => new { Fecha = group.Key, CantidadVentas = group.Count() })
+                .OrderBy(item => item.Fecha)
+                .ToList();
+
+            var fechasSemanaActual = datosVentasSemanaActual.Select(item => item.Fecha.ToShortDateString()).ToArray();
+            var cantidadVentasSemanaActual = datosVentasSemanaActual.Select(item => item.CantidadVentas).ToArray();
+
+            await JSRuntime.InvokeVoidAsync("GraficarV", new object[] { cantidadVentasSemanaActual, "Ventas totales por día", fechasSemanaActual });
+
+             var deudasPorDia = ListaVentasDeuda
+            .GroupBy(venta => venta.Fecha.Date)
+            .Select(group => new { Fecha = group.Key, TotalDeudas = group.Sum(venta => venta.Deuda) })
+            .OrderBy(item => item.Fecha)
+            .ToList();
+
+            // Convertir los datos en arreglos para el gráfico
+            var totalDeudasSemanaActual = deudasPorDia.Select(item => item.TotalDeudas).ToArray();
+
+            // Invocar la función de JavaScript para graficar las deudas de clientes
+            await JSRuntime.InvokeVoidAsync("GraficarDeudasClientes", new object[] { totalDeudasSemanaActual, "Deudas de Clientes por día", fechasSemanaActual });
+
+             var productosConCantidadMenorA5 = ListaProductos.Where(p => p.Cantidad < 5).ToList();
+            if (productosConCantidadMenorA5.Any())
+            {
+                var mensajeAlerta = "Los siguientes productos tienen una cantidad menor a 5:\n";
+                foreach (var producto in productosConCantidadMenorA5)
+                {
+                    mensajeAlerta += $"{producto.Nombre}: {producto.Cantidad}\n";
+                }
+
+                await JSRuntime.InvokeVoidAsync("alert", mensajeAlerta);
+            }    
+        
+        }
+
+    }
+
+}

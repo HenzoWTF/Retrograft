@@ -15,44 +15,63 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
+
 <PageTitle>Register</PageTitle>
+<EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
 
-<h1>Register</h1>
 
-<div class="row">
-    <div class="col-md-4">
-        <StatusMessage Message="@Message" />
-        <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
-            <DataAnnotationsValidator />
-            <h2>Create a new account.</h2>
-            <hr />
-            <ValidationSummary class="text-danger" role="alert" />
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label for="email">Email</label>
-                <ValidationMessage For="() => Input.Email" class="text-danger" />
+    <section class="vh-100 gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="fondo  col-lg-3 col-xl-4" style="border-radius: 1rem;">
+
+                    <div class="d-flex justify-content-center">
+                        <h1 class="fw-bold mb-2 text-uppercase text-center">Barberia X</h1>
+                    </div>
+
+                    <div class="card-body p-5 text-center">
+
+                        <h2 class="fw-bold mb-2 text-uppercase">Registrar</h2>
+
+                        <div class="tab-content">
+                            <form>
+                                <div class="form-outline mb-4">
+                                    <label for="email">Email</label>
+                                    <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                                    <ValidationMessage For="() => Input.Email" class="text-danger" />
+                                </div>
+
+                                <div class="form-outline mb-4">
+                                    <label for="password">Password</label>
+                                    <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                                    <ValidationMessage For="() => Input.Password" class="text-danger" />
+                                </div>
+
+                                <div class="form-outline mb-4">
+                                    <label for="confirm-password">Confirm Password</label>
+                                    <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                                    <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+                                </div>
+
+                                <div>
+                                    <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+                                </div>
+
+                                @if (errorMessage != null)
+                                {
+                                    <div class="alert alert-danger" role="alert">
+                                        @errorMessage
+                                    </div>
+                                }
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label for="password">Password</label>
-                <ValidationMessage For="() => Input.Password" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label for="confirm-password">Confirm Password</label>
-                <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
-            </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </EditForm>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            <ExternalLoginPicker />
-        </section>
-    </div>
-</div>
+        </div>
+    </section>
+</EditForm>
+
 
 @code {
     private IEnumerable<IdentityError>? identityErrors;
@@ -64,6 +83,7 @@
     private string? ReturnUrl { get; set; }
 
     private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+    private string? errorMessage;
 
     public async Task RegisterUser(EditContext editContext)
     {
@@ -77,6 +97,13 @@
         if (!result.Succeeded)
         {
             identityErrors = result.Errors;
+
+            errorMessage = "Este correo ya esta registrado";
+            foreach (var error in result.Errors)
+            {
+                errorMessage += $" {error.Description}";
+            }
+
             return;
         }
 

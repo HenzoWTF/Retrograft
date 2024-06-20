@@ -16,6 +16,5 @@ public class Facturas
     public string FormaDePago { get; set; }
     public float Total { get; set; }
     public bool Cobrada { get; set; }
-    public string PeladaT { get; set; }
     public float Deuda { get; set; }
 }

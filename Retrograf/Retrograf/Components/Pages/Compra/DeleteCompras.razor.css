@@ -1,0 +1,20 @@
+﻿.fondo {
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.LetrasMenu {
+    margin: 10px 10px 0 10px;
+    text-align: center;
+    color: black;
+    padding: 10px;
+    border-radius: 15px 15px 0 0;
+}
+
+.contenedor {
+    border-radius: 0 0 5px 5px;
+    margin-left: 12px;
+    margin-right: 12px;
+    margin-bottom: 10px;
+}

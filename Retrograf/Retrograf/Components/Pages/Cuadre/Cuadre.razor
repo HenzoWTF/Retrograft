@@ -1,0 +1,182 @@
+﻿@page "/Cuadre"
+@inject CuadreServices cuadreServices
+@inject VentasServices ventasService;
+@inject NotificationService notificationServices
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+@using Microsoft.JSInterop
+
+<PageTitle>Cuadre</PageTitle>
+<RadzenNotification />
+
+<div class="inicio">
+    <div class="bloque Ingresos">
+        <img src="./Imagenes/Ventas.png" alt="ico">
+        <h2>Ingresos</h2>
+        <p>@cuadre.Ingresos</p>
+        <p class="descripcion">Cantidad de ventas en esta semana</p>
+    </div>
+    <div class="bloque Gastos">
+        <img src="./Imagenes/ProductosI.png" alt="ico">
+        <h2>Gastos</h2>
+        <p>@cuadre.Gastos</p>
+        <p class="descripcion"><span>Cantidad de gastos en la semana</span></p>
+    </div>
+    <div class="bloque cuadre">
+         <label class="text-dark">Opción:</label>
+                <select class="form-select mb-3" @bind="selectedOption">
+                    <option value="diario">Diario</option>
+                    <option value="semanal">Semanal</option>
+                    <option value="Mensual">Mensual</option>
+                </select>
+                <h6 class="text-dark">@cuadre.FechaCuadre.ToShortDateString()</h6>
+                <button class="btn btn-primary" @onclick="CalcularCuadre">Calcular</button>
+    </div>
+</div>
+
+<div class="chart-container-Center">
+    <div style="width:1000px; height:00px">
+        <canvas id="myChart"></canvas>
+    </div>
+</div>
+
+<script>
+    window.Graficar = async (data) => {
+        const ctx = document.getElementById('myChart');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Ganancias y Pérdidas'
+                    }
+                }
+            }
+        });
+    };
+
+</script>
+
+@code {
+    public string selectedOption = "diario";
+    public Clases.Cuadre cuadre = new Clases.Cuadre();
+    public List<Ventas> ListaVentas = new List<Ventas>();
+    private bool cuadreRealizadoHoy = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ActualizarGrafico();
+    }
+
+    private async Task ActualizarGrafico()
+    {
+        var data = await ObtenerDatosGrafico();
+        await JSRuntime.InvokeVoidAsync("Graficar", data);
+    }
+
+    private async Task<object> ObtenerDatosGrafico()
+    {
+        if (selectedOption == "diario")
+        {
+            DateTime fecha = DateTime.Today;
+            cuadre = await cuadreServices.CalcularCuadreDiario(fecha);
+        }
+        else if (selectedOption == "semanal")
+        {
+            DateTime fechaInicioSemana = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+            cuadre = await cuadreServices.CalcularCuadreSemanal(fechaInicioSemana);
+        }
+        else if (selectedOption == "mensual")
+        {
+            DateTime primerDiaMes = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            cuadre = await cuadreServices.CalcularCuadreMensual(primerDiaMes);
+        }
+
+        // Datos para el gráfico
+        var data = new
+        {
+            labels = new[] { "Ingresos", "Gastos" },
+            datasets = new[]
+            {
+                new { label = "Ingresos", data = new[] { cuadre.Ingresos } },
+                new { label = "Gastos", data = new[] { cuadre.Gastos } }
+            }
+        };
+
+        return data;
+    }
+
+    private async Task CalcularCuadre()
+    {
+
+        if (!cuadreRealizadoHoy)
+        {
+            if (selectedOption == "diario")
+            {
+                DateTime fecha = DateTime.Today;
+                cuadre = await cuadreServices.CalcularCuadreDiario(fecha);
+                await cuadreServices.GuardarCuadreEnBaseDeDatos(fecha);
+                var Mensaje1 = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Guardado",
+                        Detail = "Cuadre diario " ,
+                        Duration = 3000
+                    };
+                notificationServices.Notify(Mensaje1);
+                await Task.Delay(3000);
+            }
+            else if (selectedOption == "semanal")
+            {
+                DateTime fechaInicioSemana = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+                cuadre = await cuadreServices.CalcularCuadreSemanal(fechaInicioSemana);
+                await cuadreServices.GuardarCuadreEnBaseDeDatosSemanal(fechaInicioSemana);
+                var Mensaje2 = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Guardado",
+                        Detail = "Cuadre semanal " ,
+                        Duration = 3000
+                    };
+                notificationServices.Notify(Mensaje2);
+                await Task.Delay(3000);
+            }
+            else if (selectedOption == "mensual")
+            {
+                DateTime primerDiaMes = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+                cuadre = await cuadreServices.CalcularCuadreMensual(primerDiaMes);
+                await cuadreServices.GuardarCuadreEnBaseDeDatosMensual(primerDiaMes);
+                var Mensaje3 = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Guardado",
+                        Detail = "Cuadre mensual " ,
+                        Duration = 3000
+                    };
+                notificationServices.Notify(Mensaje3);
+                await Task.Delay(3000);
+            }
+            cuadreRealizadoHoy = true;
+
+        }
+        else
+        {           
+            var Mensaje4 = new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "No se guardo" ,
+                Duration = 3000
+            };
+            notificationServices.Notify(Mensaje4);
+            await Task.Delay(3000);
+        }
+    }
+}

@@ -1,0 +1,88 @@
+﻿@page "/MenuCobrar"
+@inject NotificationService notificationServices
+@inject VentasServices ventasServices
+@inject NavigationManager navigationManager
+@* @attribute [Authorize(Roles = "Admin")] *@
+
+@rendermode InteractiveServer
+
+
+<PageTitle>Cobrar</PageTitle>
+<RadzenNotification />
+<div class="d-flex justify-content-center">
+    <img src="/Imagenes/Logo.png" alt="Logo de la aplicación" style="width:200px; height:auto; display: block;">
+</div>
+
+
+<section class=" gradient-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="fondo " style="border-radius: 1rem;">
+
+                <div class="card-body p-5 text-center">
+                    <h1 class="fw-bold mb-2 text-uppercase">Cobrar</h1>
+
+                    <div class="tab-content">
+                        <form>
+
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Fecha</th>
+                                        <th>Cliente</th>
+                                        <th>Deuda</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @if (!ventas.Any())
+                                    {
+                                        <tr>
+                                            <td colspan="3" class="text-center">@mensaje</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var ventas in ventas)
+                                        {
+                                            <tr>
+                                                <img src="/Imagenes/Factura.png" style="width: 50px; height: auto; margin-right: 10px;" />
+                                                <td>@ventas.Fecha.ToShortDateString()</td>
+                                                <td>@ventas.Cliente</td>
+                                                <td>@ventas.Deuda</td>
+                                                <td>
+                                                    <div>
+                                                        <a href="/ViewVenta/@ventas.VentaId" class="btn btn-outline-primary"><i class="bi bi-eye" /> Ver</a>
+                                                        <a href="/CreateCobrar/@ventas.VentaId" class="btn btn-outline-primary"><i class="bi bi-coin" /> Cobrar</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    public List<Ventas> ventas = new List<Ventas>();
+    public Ventas ventaSeleccionada = new Ventas();
+    public string mensaje;
+    public float Pago;
+    public bool Confirmacion = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ventas == null || !ventas.Any())
+            mensaje = "No hay datos";
+
+        ventas = await ventasServices.GetVentasDeudas();
+    }
+}

@@ -1,0 +1,103 @@
+﻿@page "/CreateCobrar/{Id:int}"
+@inject NotificationService notificationServices
+@inject VentasServices VentasServices
+@inject NavigationManager navigationManager
+@* @attribute [Authorize(Roles = "Admin")] *@
+
+@rendermode InteractiveServer
+
+
+<PageTitle>Cobrar</PageTitle>
+<RadzenNotification />
+<div class="d-flex justify-content-center">
+    <img src="/Imagenes/Logo.png" alt="Logo de la aplicación" style="width:200px; height:auto; display: block;">
+</div>
+
+<section class="gradient-custom justify-content-center">
+    <div class="container py-5">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="fondo col-lg-3 col-xl-4" style="border-radius: 1rem;">
+                <div class="card-body p-5 text-center">
+                    <h1 class="fw-bold mb-2 text-uppercase">Cobrar</h1>
+
+                    <div class="tab-content">
+                        <h6 class="fw-bold mb-2 text-uppercase">Cliente: @ventas.Cliente</h6>
+                        <form>
+                            <div class="table-container">
+                                <div class="row justify-content-center">
+                                    <th>Total:</th>
+                                    <td>@ventas.Total</td>
+                                </div>
+                                <label class="form-label" for="VentaId"><strong>Pago:</strong></label>
+                                <InputNumber id="VentaId" class="form-control" @bind-Value="Pago"></InputNumber>
+                                
+                            </div>
+                            <div class="text-center">
+                                <a href="/MenuCobrar" class="btn btn-primary"><i class="bi bi-arrow-left"></i> Cancelar</a>
+                                <button type="button" class="btn btn-success" @onclick=@(async () => await Guardar())><i class="bi bi-coin"></i>Cobrar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public Ventas ventas = new Ventas();
+    public string mensaje;
+    public float Pago;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ventas == null)
+            mensaje = "No hay datos";
+
+        ventas = await VentasServices.GetVenta(Id);
+    }
+
+    public async Task Guardar()
+    {
+        ventas.Deuda -= Pago;
+
+        var response = await VentasServices.PutCompras(Id, ventas);
+        if (response != null)
+        {
+            if(ventas.Deuda == 0)
+            {
+                ventas.Cobrada = true;
+            }
+            else
+            {
+                var successMessage = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Guardado",
+                        Detail = "Producto guardado con éxito",
+                        Duration = 5000
+                    };
+                notificationServices.Notify(successMessage);
+
+                // Redirigir después de guardar
+                navigationManager.NavigateTo("/MenuCobrar");                
+            }
+        }
+        else
+        {
+            var errorMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error al guardar",
+                    Detail = "Ha ocurrido un error al guardar el producto",
+                    Duration = 5000
+                };
+            notificationServices.Notify(errorMessage);
+        }
+    }
+
+}

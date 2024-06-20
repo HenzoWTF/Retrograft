@@ -16,17 +16,39 @@
 
 <StatusMessage Message="@statusMessage" />
 
-@if (emailConfirmationLink is not null)
-{
-    <p>
-        This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
-        Normally this would be emailed: <a href="@emailConfirmationLink">Click here to confirm your account</a>
-    </p>
-}
-else
-{
-    <p>Please check your email to confirm your account.</p>
-}
+<section class="vh-100 gradient-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="fondo  col-lg-3 col-xl-4" style="border-radius: 1rem;">
+
+                <div class="d-flex justify-content-center">
+                    <h1 class="fw-bold mb-2 text-uppercase text-center">Barberia X</h1>
+                </div>
+
+                <div class="card-body p-5 text-center">
+
+                    <h2 class="fw-bold mb-2 text-uppercase">Login</h2>
+
+                    <div class="tab-content">
+                        <form>
+                            @if (emailConfirmationLink is not null)
+                            {
+                                <p>
+                                    <button onclick="window.location.href='@emailConfirmationLink'" class="btn btn-primary">Click aquí para confirmar tu correo</button>
+                                </p>
+
+                            }
+                            else
+                            {
+                                <p>Por favor confirme su correo de la cuenta</p>
+                            }
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 @code {
     private string? emailConfirmationLink;
@@ -45,7 +67,7 @@ else
     {
         if (Email is null)
         {
-            RedirectManager.RedirectTo("");
+            RedirectManager.RedirectTo("Account/Login");
         }
 
         var user = await UserManager.FindByEmailAsync(Email);

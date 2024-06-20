@@ -1,0 +1,69 @@
+﻿@page "/ViewClientes/{Id:int}"
+@using Microsoft.AspNetCore.Authorization
+@inject ClienteServices ClientesServices
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+@* @attribute [Authorize(Roles = "Admin")] *@
+
+
+<PageTitle>Detalle de Cliente</PageTitle>
+
+<RadzenNotification />
+<div class="d-flex justify-content-center">
+    <img src="/Imagenes/Logo.png" alt="Logo de la aplicación" style="width:200px; height:auto; display: block;">
+</div>
+
+
+<section class="vh-100 gradient-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center">
+            <div class="fondo col-lg-6 col-xl-6 " style="border-radius: 2rem;">
+
+                <div class="card-body p-5">
+                    <h2 class="fw-bold mb-2 text-uppercase text-center">Editar ventas</h2>
+
+                    <div class="row tab-content">
+                        <div class="mb-4">
+                            <div class="row card-body">
+                                <!-- Datos de la venta -->
+                                <div class="col-md-11 mx-auto">
+                                    <h3 class="text-center"><strong>Datos de la venta</strong></h3>
+                                    <div class="border-primmary border border-2 borde">
+                                        <div class="card-body">
+                                            <ul class="list-unstyled" style="margin-top: 20px; margin-bottom: 20px;">
+                                                <li><strong>Fecha:</strong> @ClienteSeleccionado.NombreCliente</li>
+                                                <li><strong>Nombre:</strong> @ClienteSeleccionado.DireccionCliente</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center mt-3">
+                            <a href="/ClientesIndex" class="w-20 btn btn-lg btn-primary ms-3"><i class="bi bi-arrow-left"></i> Volver</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    public Cliente ClienteSeleccionado { get; set; } = new Cliente();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ClienteSeleccionado = await ClientesServices.GetCliente(Id);
+    }
+
+    void Volver()
+    {
+        NavigationManager.NavigateTo("/ClientesIndex");
+    }
+}

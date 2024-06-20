@@ -1,0 +1,199 @@
+﻿@page "/DeleteCompra/{Id:int}"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@rendermode InteractiveServer
+@inject ComprasServices comprasServices
+@inject ProductosServices productosServices
+@inject NavigationManager navigationManager
+@inject NotificationService notificationServices
+@inject IJSRuntime JSRuntime
+@* @attribute [Authorize(Roles = "Admin")] *@
+
+<RadzenNotification />
+<PageTitle>Eliminar Compra</PageTitle>
+<div class="d-flex justify-content-center">
+    <img src="/Imagenes/Logo.png" alt="Logo de la aplicación" style="width:200px; height:auto; display: block;">
+</div>
+
+
+<section class=" gradient-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="fondo col-lg-6 col-xl-6" style="border-radius: 1rem;">
+
+                <div class="card-body p-5 text-center">
+                    <h1 class="fw-bold mb-2 text-uppercase">Eliminar Compra</h1>
+
+                    <div class="tab-content">
+
+                        <div class="col-md-11 mx-auto">
+                            <h3 class="text-center"><strong>Datos de la compra</strong></h3>
+                            <div class="border-primmary border border-2 borde">
+                                <div class="card-body">
+                                    <ul class="list-unstyled" style="margin-top: 20px; margin-bottom: 20px;">
+                                        <li><strong>FechaCreacion:</strong> @Compras.FecheDeCompra.ToShortDateString()</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Productos -->
+                        <div class="col-md-11 mx-auto">
+                            <h3 class="text-center"><strong>Productos</strong></h3>
+                            @if (Compras.CompraDetalles.Count > 0)
+                            {
+                                <table class="table table-bordered miTabla">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio Compra</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var detalle in Compras.CompraDetalles)
+                                        {
+                                            <tr>
+                                                <td>@ObtenerProducto(detalle.ProductoId)</td>
+                                                <td>@detalle.Cantidad</td>
+                                                <td>@detalle.PrecioCompra</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                                <p><strong>Total de compras: </strong>@Compras.CompraDetalles.Count</p>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+
+                    <div class="d-flex justify-content-center mt-3">
+                        <td>
+                            <div>
+                                <a href="/CompraIndex" class="w-20 btn btn-outline-primary ms-3"><i class="bi bi-arrow-left"></i> Volver</a>
+                                <button @onclick="() => ConfirmarEliminar(Compras.CompraId)" class="btn btn-outline-danger"><i class="bi bi-trash-fill" /> Eliminar</button>
+                            </div>
+                        </td>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@if (Confirmacion)
+{
+    <div class="modal fade show" id="confirmarModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick=Close></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de que desea eliminar este barbero?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick=Close>Cancelar</button>
+                    <button type="button" class="btn btn-danger" @onclick=@(async () => await Eliminar(Id))>Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+
+	[Parameter]
+	public int Id { get; set; }
+	public bool Confirmacion = false;
+	private Compra Compras { get; set; } = new Compra();
+	public IEnumerable<Productos> Productos { get; set; } = new List<Productos>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (Id > 0)
+		{
+			Compras = await comprasServices.GetCompra(Id);
+			Productos = await productosServices.GetProductos();
+		}
+    }
+
+    private void Close()
+    {
+        Confirmacion = false;
+    }
+
+    private async Task ConfirmarEliminar(int id)
+    {
+        Confirmacion = true;
+    }
+
+	private async Task Eliminar(int Id)
+	{
+		if (Id != 0)
+		{
+			// Almacenar el precio original de cada producto
+			Dictionary<int, float> preciosOriginales = new Dictionary<int, float>();
+			foreach (var detalle in Compras.CompraDetalles)
+			{
+				var producto = Productos.FirstOrDefault(p => p.ProductoId == detalle.ProductoId);
+				if (producto != null)
+				{
+					preciosOriginales.Add(detalle.ProductoId, producto.PrecioCompra);
+				}
+			}
+
+			// Restar las cantidades de productos correspondientes a los detalles de la compra
+			foreach (var detalle in Compras.CompraDetalles)
+			{
+				var producto = Productos.FirstOrDefault(p => p.ProductoId == detalle.ProductoId);
+				if (producto != null)
+				{
+					producto.Cantidad -= detalle.Cantidad;
+					await productosServices.PutProducto(producto.ProductoId, producto);
+				}
+			}
+
+			// Restaurar el precio de compra original de cada producto
+			foreach (var detalle in Compras.CompraDetalles)
+			{
+				if (preciosOriginales.TryGetValue(detalle.ProductoId, out float precioOriginal))
+				{
+					var producto = Productos.FirstOrDefault(p => p.ProductoId == detalle.ProductoId);
+					if (producto != null)
+					{
+						producto.PrecioCompra = precioOriginal;
+						await productosServices.PutProducto(producto.ProductoId, producto);
+					}
+				}
+			}
+
+			// Eliminar la compra
+			await comprasServices.DeleteCompras(Id);
+
+			var Mensaje = new NotificationMessage
+				{
+					Severity = NotificationSeverity.Error,
+					Summary = "Eliminación exitosa",
+					Detail = "Se ha eliminado la compra",
+					Duration = 1_000
+				};
+			notificationServices.Notify(Mensaje);
+			await Task.Delay(1000);
+            navigationManager.NavigateTo("/CompraIndex");
+		}
+	}
+
+
+	public string ObtenerProducto(int id)
+	{
+		var dato = Productos.FirstOrDefault(c => c.ProductoId == id);
+
+		return dato.Nombre;
+	}
+}
+

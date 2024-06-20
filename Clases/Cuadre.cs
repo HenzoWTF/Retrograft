@@ -8,6 +8,7 @@ namespace Clases;
 public class Cuadre
 {
     public int CuadreId { get; set; }
+    public string Nombre { get; set; }
     public DateTime FechaCuadre { get; set; }
     public float Ingresos { get; set; }
     public float Deudas { get; set; }

@@ -1,0 +1,151 @@
+﻿@page "/IndexVentas"
+
+@using Microsoft.AspNetCore.Authorization
+@inject VentasServices ventasService
+@inject NavigationManager navigationManager
+@inject ProductosServices productosServices
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+@* @attribute [Authorize(Roles = "Admin")] *@
+
+
+
+
+<PageTitle>Ventas</PageTitle>
+<RadzenNotification />
+<div class="d-flex justify-content-center">
+    <img src="/Imagenes/Logo.png" alt="Logo de la aplicación" style="width:200px; height:auto; display: block;">
+</div>
+
+
+<section class=" gradient-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="fondo " style="border-radius: 1rem;">
+
+                <div class="card-body p-5 text-center">
+                    <h1 class="fw-bold mb-2 text-uppercase">Ventas</h1>
+                    <div class="row">
+                        <div class="col-8">
+
+                            @* Fechas *@
+                            <h4>Filtrar Clientes</h4>
+                            <div class='row'>
+                                <div class='col-4'>
+                                    <label>Nombre</label>
+                                    <div class="input-group mb-3">
+                                        <input id="criterioBusqueda" type="text" class="form-control" @bind="criterio" />
+                                        <button type="button" @onclick="Filtrar" class="btn btn-outline-primary bi bi-search"></button>
+                                    </div>
+                                </div>
+                                <div class='col-4'>
+                                    <label>Fecha de Registro Desde</label>
+                                    <InputDate @bind-Value="FechaInicial" class="form-control"></InputDate>
+                                </div>
+                                <div class='col-4'>
+                                    <label>Fecha de Registro Hasta</label>
+                                    <InputDate @bind-Value="FechaFinal" class="form-control"></InputDate>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content">
+                        <form>
+                            <div class="table-container" style="max-height: 800px; overflow-y: auto;">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Cliente</th>
+                                            <th>Fecha de venta</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        @if (ventas.Count == 0)
+                                        {
+                                            @mensaje
+                                        }
+                                        else
+                                        {
+                                            @foreach (var venta in ventas)
+                                            {
+                                                <tr>
+                                                    <td>@venta.VentaId</td>
+                                                    <td>@venta.Cliente</td>
+                                                    <td>@venta.Fecha.ToShortDateString()</td>
+                                                    <td>
+                                                        <div>
+                                                            <a href="/EditVenta/@venta.VentaId" class="btn btn-outline-primary"><i class="bi bi-pencil-fill" /> Editar</a>
+                                                            <a href="/ViewVenta/@venta.VentaId" class="btn btn-outline-primary"><i class="bi bi-eye" /> View</a>
+                                                            <a href="/DeleteVentas/@venta.VentaId" class="btn btn-outline-danger"><i class="bi bi-trash-fill" /> Eliminar</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+
+
+                                        }
+                                    </tbody>
+
+                                </table>
+                                <div>
+                                    <button type="button" @onclick="ReiniciarFiltro" class="btn btn-outline-secondary bi bi-arrow-clockwise"> Reiniciar Filtro</button>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@code {
+    private List<Ventas> ventas = new List<Ventas>();
+    public string filtro { get; set; }
+    public string criterio { get; set; } = string.Empty;
+    public DateTime FechaInicial { get; set; } = DateTime.Today.AddDays(-7); // Default: 7 días atrás
+    public DateTime FechaFinal { get; set; } = DateTime.Today;
+    public string mensaje = "";
+    public IEnumerable<Cliente> cliente = new List<Cliente>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ventas = (await ventasService.GetVentas()).ToList();
+            if (ventas == null || !ventas.Any())
+                mensaje = "No hay datos";
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar datos: {ex.Message}";
+        }
+    }
+
+    public async Task Nuevo()
+    {
+        mensaje = string.Empty;
+    }
+
+    async Task Filtrar()
+    {
+        ventas = await ventasService.GetList(Venta =>
+            (string.IsNullOrEmpty(criterio) || Venta.Cliente.Contains(criterio)));
+    }
+
+
+    void ReiniciarFiltro()
+    {
+        criterio = string.Empty;
+        FechaInicial = DateTime.Today.AddDays(-7);
+        FechaFinal = DateTime.Today;
+        Filtrar();
+    }
+}

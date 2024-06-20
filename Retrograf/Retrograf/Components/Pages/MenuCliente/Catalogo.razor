@@ -1,0 +1,86 @@
+﻿@page "/Catalogo"
+@inject ProductosServices productosServices
+@inject CarritoServices carritoServices
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Catalogo</PageTitle>
+
+<div class="catalogos">
+    <div class="container">
+        <div class="row">
+            @foreach (var item in productos)
+            {
+                <div class="col-md-2 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="img-container text-center mb-3">
+                                @if (item.Foto != null)
+                                {
+                                    var base64 = Convert.ToBase64String(item.Foto);
+                                    var imgSrc = $"data:image/jpeg;base64,{base64}";
+
+                                    <img src="@imgSrc" alt="Imagen del producto" class="item-imagen" style="max-height: 100px; max-width: 100px;" />
+                                }
+                            </div>
+                            <div class="justify-content-center text-center">
+                                <div class="mb-3">
+                                    @item.Nombre
+                                    @item.Descripcion
+                                </div>
+                                <h6><strong>Precio:</strong></h6>
+                                <div>
+                                    RD$ @item.PrecioVenta
+                                </div>
+                                <h6><strong>Cantidad:</strong></h6>
+                                <div class="mb-1">
+                                    @item.Cantidad
+                                </div>
+                                <button @onclick="()=>AgregarAlCarrito(item)" type="button" class="btn btn-info">Agregar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Carrito flotante -->
+<div class="floating-cart">
+    <button @onclick="MostrarCarrito" class="btn btn-primary">
+        <span class="bi bi-cart2"></span>
+        <span class="badge">@((carrito != null ? carrito.Count : 0))</span>
+    </button>
+</div>
+
+@code
+{
+    private List<Productos> productos = new List<Productos>();
+    private List<Carrito> carrito; // No inicializar aquí
+
+    protected override async Task OnInitializedAsync()
+    {
+        productos = await productosServices.GetProductos();
+        carrito = await carritoServices.GetCarritos(); // Llenar la lista de carrito aquí
+    }
+
+    private async Task AgregarAlCarrito(Productos producto)
+    {
+        var carritoItem = new Carrito
+            {
+                ProductoId = producto.ProductoId,
+                Nombre = producto.Nombre,
+                Cantidad = 1, // Puedes ajustar la cantidad inicial aquí
+                Precio = producto.PrecioVenta // Precio del producto
+            };
+
+        await carritoServices.PostCarrito(carritoItem);
+        carrito = await carritoServices.GetCarritos(); // Actualizar el carrito después de agregar un producto
+    }
+
+    private void MostrarCarrito()
+    {
+        navigationManager.NavigateTo("/carritoCompras");
+    }
+}
