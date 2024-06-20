@@ -4,6 +4,7 @@
 @inject NotificationService notificationServices
 @inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
+@attribute [Authorize(Roles = "Admin")]
 @using Microsoft.JSInterop
 
 <PageTitle>Cuadre</PageTitle>
