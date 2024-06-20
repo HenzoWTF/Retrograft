@@ -3,7 +3,7 @@
 @inject ComprasServices comprasService
 @inject ProductosServices productosServices
 @rendermode InteractiveServer
-@* @attribute [Authorize(Roles = "Admin")] *@
+@attribute [Authorize(Roles = "Admin")]
 
 
 <PageTitle>Compras</PageTitle>
@@ -24,10 +24,6 @@
 
                     <div class="tab-content">
                         <form>
-                            @*
-                            <div>
-                            <button type="submit" class="w-20 btn btn-lg btn-success"><i class="bi bi-floppy"></i> Aceptar</button>
-                            </div> *@
                             <table class="table">
                                 <thead>
                                     <tr>
